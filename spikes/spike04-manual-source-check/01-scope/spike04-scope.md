@@ -14,12 +14,38 @@ Als een aanvraag voldoende concreet is, kan een handmatige zoekprocedure binnen 
 - alternatieve zoekrichting;
 - bewijs dat de aanvraag te vaag of onrealistisch is.
 
+Daarnaast testen we of Classic Parts Finder waarde toevoegt door de zoekvraag zelf te verbeteren. Een ruwe aanvraag mag dus via community-, specialist- of broninformatie worden omgezet naar verfijnde zoektermen.
+
 ## Slaagcriterium
 
 Spike04 slaagt wanneer de manual source check aantoont dat het proces herhaalbaar is:
 
 ```text
-case -> zoekstrategie -> kanaalchecks -> leads -> beoordeling -> volgende actie
+case -> zoekstrategie -> kanaalchecks -> specificatieverrijking -> refined search -> leads -> beoordeling -> volgende actie
+```
+
+## Specification refinement loop
+
+De sourcingflow is niet lineair. Als een kanaal nieuwe specificatie oplevert, keren we terug naar eerdere kanalen met betere zoektermen.
+
+Voorbeelden van nieuwe specificatie:
+
+- modelgeneratie;
+- partnummer;
+- alternatieve benaming;
+- diameter/maatvoering;
+- Nardi-lijn of variant;
+- hub/boss/adaptor;
+- compatibele bouwjaren;
+- leverancier- of communityadvies.
+
+Refined searches worden apart gelogd, bijvoorbeeld:
+
+```text
+channel_1b_google_refined
+channel_2b_marketplace_refined
+channel_3b_community_refined
+channel_4b_specialist_refined
 ```
 
 ## Te testen cases
@@ -64,9 +90,11 @@ Deze case is commercieel interessanter, want een Nardi-stuurwiel is een herkenba
 2. missing_info_check
 3. search_terms_nl_en_de_fr
 4. channel_attempts
-5. lead_candidates
-6. lead_quality_score
-7. recommended_next_action
+5. specification_refinements
+6. refined_search_attempts
+7. lead_candidates
+8. lead_quality_score
+9. recommended_next_action
 ```
 
 ## Go naar Spike05 wanneer
@@ -74,6 +102,7 @@ Deze case is commercieel interessanter, want een Nardi-stuurwiel is een herkenba
 - minstens één realistische case bruikbare leads oplevert;
 - het werkproces duidelijk genoeg is om te herhalen;
 - de tijd per case meetbaar is;
+- minstens één refinement loop is getest wanneer nieuwe specificatie beschikbaar kwam;
 - de grootste herhaalbare taken geïdentificeerd zijn voor automatisering.
 
 ## No-go of herwerk wanneer
@@ -82,4 +111,5 @@ Deze case is commercieel interessanter, want een Nardi-stuurwiel is een herkenba
 - er geen bruikbare bronnen gevonden worden;
 - handmatige opvolging te rommelig is;
 - er privacy- of toestemmingsproblemen ontstaan;
-- de sourcer niet objectief kan bepalen of een lead past.
+- de sourcer niet objectief kan bepalen of een lead past;
+- refined searches geen betere beoordeling opleveren en de intake dus eerst scherper moet.
