@@ -1,0 +1,6 @@
+date,flow_id,case_label,channel,source_name,search_term,url_or_contact,action_type,result,lead_score,response_status,next_action,time_spent_minutes,notes
+2026-06-26,7Xo88NP,Alfa Romeo Spider Nardi stuurwiel,Google,Google Search,"Alfa Romeo Spider 1990 Nardi stuurwiel",,search,pending,,not_contacted,continue,0,
+2026-06-26,7Xo88NP,Alfa Romeo Spider Nardi stuurwiel,Marketplace,eBay/Marktplaats/2dehands,"Nardi steering wheel Alfa Romeo Spider 1990",,search,pending,,not_contacted,continue,0,
+2026-06-26,7Xo88NP,Alfa Romeo Spider Nardi stuurwiel,Community,Alfa Romeo forum/Facebook,"Alfa Romeo Spider Nardi steering wheel",,post_or_message,pending,,not_contacted,wait_response,0,
+2026-06-26,7Xo88NP,Alfa Romeo Spider Nardi stuurwiel,Specialist,Classic Alfa/Nardi specialist,"Nardi hub Alfa Romeo Spider 1990",,email_or_contact,pending,,not_contacted,wait_response,0,
+2026-06-26,7Xo88NP,Alfa Romeo Spider Nardi stuurwiel,Breaker,classic Alfa breaker,"Alfa Spider parts steering wheel",,email_or_phone,pending,,not_contacted,continue,0,
