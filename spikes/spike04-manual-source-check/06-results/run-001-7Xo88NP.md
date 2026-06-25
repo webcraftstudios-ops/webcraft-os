@@ -3,7 +3,7 @@
 ## Status
 
 ```text
-status: google_broad_search_done
+status: marketplace_search_done
 started_at: 2026-06-26
 last_updated_at: 2026-06-26
 flow_id: 7Xo88NP
@@ -60,7 +60,7 @@ Alfa Romeo Spider Series 4 Nardi steering wheel
 | # | Kanaal | Doel | Status |
 |---|---|---|---|
 | 1 | Google brede search | oriënteren op termen, varianten, specialisten | done |
-| 2 | Marketplace | eBay/Marktplaats/2dehands kandidaten | pending |
+| 2 | Marketplace | eBay/Marktplaats/2dehands kandidaten | done |
 | 3 | Community/forum | Alfa Romeo Spider/Nardi kennis | pending |
 | 4 | Specialist | Nardi/Alfa classic specialist contacteren | pending |
 | 5 | Breaker/parts supplier | gebruikte delen of stuur/naaf | pending |
@@ -106,7 +106,55 @@ Google brede search leverde nog geen harde marketplace-match of concrete verkope
 3. Alfa-specialist contacteren voor hub/boss/naafadvies
 ```
 
-### Belangrijkste blocking issue
+## Kanaalpoging 2 — Marketplace search
+
+### Zoekdoel
+
+Controleren of er direct beschikbare marketplace-kandidaten zijn op of rond:
+
+- eBay;
+- Marktplaats;
+- 2dehands;
+- algemene geïndexeerde marketplace-resultaten.
+
+### Queries uitgevoerd
+
+```text
+site:ebay.com Nardi steering wheel Alfa Romeo Spider
+site:ebay.co.uk Nardi steering wheel Alfa Romeo Spider
+site:marktplaats.nl Alfa Romeo Spider Nardi stuurwiel
+site:2dehands.be Nardi stuurwiel Alfa Romeo Spider
+Nardi steering wheel Alfa Romeo eBay
+Nardi stuurwiel Alfa Romeo Marktplaats
+Nardi stuurwiel Alfa Romeo 2dehands
+Nardi Classic steering wheel Alfa Romeo Spider sale
+Nardi hub Alfa Romeo Spider eBay
+```
+
+### Bevindingen
+
+| Marketplace | Resultaat | Lead score | Actie |
+|---|---|---:|---|
+| eBay | Geen verifieerbare Spider-specifieke marketplace-listing gevonden via de beschikbare search-resultaten. | 1 | Later manueel in browser controleren met filters op locatie/wereldwijd. |
+| Marktplaats | Geen verifieerbare Alfa Spider/Nardi match gevonden via geïndexeerde zoekresultaten. | 1 | Niet verder pushen in Spike04 zonder browser/UI-check. |
+| 2dehands | Geen verifieerbare match gevonden via geïndexeerde zoekresultaten. | 1 | Niet verder pushen in Spike04 zonder browser/UI-check. |
+| Brede search | Resultaten gingen vooral naar achtergrondinformatie over Nardi en Alfa Spider, niet naar concrete productlistings. | 1 | Marketplace-kanaal levert voorlopig geen harde lead. |
+
+### Conclusie kanaal 2
+
+Marketplace search leverde geen harde productlead op.
+
+Belangrijk: dit betekent niet dat er geen aanbod bestaat. Het betekent alleen dat de beschikbare geïndexeerde websearch geen betrouwbare, citeerbare marketplace-match opleverde.
+
+### Beslissing na kanaal 2
+
+```text
+marketplace_result: no_verified_product_lead
+best_lead_score: 1
+next_action: ga door naar community/forum of specialistvraag
+```
+
+## Belangrijkste blocking issue
 
 ```text
 De aanvraag vermeldt alleen “Nardi Stuurwiel”. Voor een echte match is minimaal nodig: diameter, exacte Nardi-lijn/variant, 6-bouts/PCD, naaf/hub/adaptor en voorkeur origineel/repro/gebruikt.
@@ -119,14 +167,14 @@ max_active_search_time: 90 minuten
 stop bij: lead_score >= 4, 5 kanalen zonder match, of blokkerende ontbrekende info
 ```
 
-## Tussenresultaat na kanaal 1
+## Tussenresultaat na kanaal 2
 
 ```text
-active_search_time: 20 minuten
-channels_checked: 1
+active_search_time: 35 minuten
+channels_checked: 2
 leads_found: 0 harde productleads, 3 specialist/source leads
 best_lead_score: 3
 first_response_time: n.v.t.
 blocking_issues: naaf/hub/diameter/variant ontbreken
-recommended_next_action: marketplace search + specialistvraag voorbereiden
+recommended_next_action: community/forum check of specialistvraag voorbereiden
 ```
