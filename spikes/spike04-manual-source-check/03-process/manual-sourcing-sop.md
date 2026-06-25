@@ -23,6 +23,8 @@ lead_found: yes/no
 lead_quality_score: 1-5
 best_lead_url_or_contact:
 missing_information:
+specification_refinements:
+refined_search_done: yes/no
 recommended_next_action:
 time_spent_minutes:
 ```
@@ -89,7 +91,51 @@ Optioneel:
 7. Internationaal platform.
 8. Event/autojumble.
 
-## Stap 5 — Lead beoordelen
+## Stap 5 — Specification refinement loop
+
+Na elk kanaal moet de tester beoordelen of de zoekopdracht beter is geworden.
+
+Activeer de loop wanneer een kanaal nieuwe specificatie oplevert, zoals:
+
+- betere modelgeneratie;
+- onderdeelnummer;
+- alternatieve naam of vertaling;
+- diameter, maat of uitvoering;
+- compatibiliteitsinfo;
+- hub/boss/adaptor;
+- merk- of leveranciersnaam;
+- communityadvies;
+- uitsluiting van een verkeerde zoekrichting.
+
+Wanneer dat gebeurt:
+
+```text
+1. noteer de nieuwe specificatie
+2. maak nieuwe zoektermen
+3. keer terug naar eerdere kanalen
+4. log deze poging als refined search
+5. vergelijk lead_score_before en lead_score_after
+```
+
+Gebruik kanaalnamen zoals:
+
+```text
+channel_1b_google_refined
+channel_2b_marketplace_refined
+channel_3b_community_refined
+channel_4b_specialist_refined
+```
+
+Voorbeeld voor `7Xo88NP`:
+
+```text
+origineel: Alfa Romeo Spider 1990 Nardi stuurwiel
+refined: Alfa Romeo Spider Series 4 Nardi steering wheel
+refined: Alfa Romeo Spider 105 115 Nardi hub boss kit
+refined: Nardi Classico Alfa Spider 115
+```
+
+## Stap 6 — Lead beoordelen
 
 Score elke lead 1–5:
 
@@ -101,7 +147,7 @@ Score elke lead 1–5:
 | 4 | waarschijnlijk passend |
 | 5 | sterk passend, met foto/partnummer/prijs/contact |
 
-## Stap 6 — Contact leggen
+## Stap 7 — Contact leggen
 
 Gebruik templates uit:
 
@@ -111,7 +157,7 @@ Gebruik templates uit:
 
 Deel geen persoonsgegevens van de aanvrager. Gebruik alleen case-informatie die nodig is om het onderdeel te identificeren.
 
-## Stap 7 — Loggen
+## Stap 8 — Loggen
 
 Elke poging wordt gelogd in:
 
@@ -130,9 +176,10 @@ Minimaal loggen:
 - lead score;
 - reactie;
 - volgende stap;
-- tijd besteed.
+- tijd besteed;
+- of het een originele of verfijnde zoekpoging was.
 
-## Stap 8 — Case afsluiten
+## Stap 9 — Case afsluiten
 
 Mogelijke uitkomsten:
 
@@ -142,6 +189,7 @@ needs_more_info
 no_match_after_manual_search
 escalate_to_specialist
 candidate_for_automation
+intake_needs_better_specification
 ```
 
 ## Stopregels
@@ -149,7 +197,7 @@ candidate_for_automation
 Stop met actief zoeken wanneer één van deze gebeurt:
 
 - lead score 4 of 5 gevonden;
-- 5 kanalen doorlopen zonder bruikbaar resultaat;
+- 5 kanalen doorlopen zonder bruikbaar resultaat én minstens één refinement loop is overwogen;
 - ontbrekende info blokkeert verder zoeken;
 - maximale actieve zoektijd bereikt;
 - privacy/toestemming onduidelijk.
