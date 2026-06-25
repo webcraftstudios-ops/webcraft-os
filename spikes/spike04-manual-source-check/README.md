@@ -38,6 +38,8 @@ In scope:
 - reactietijd meten;
 - matchkwaliteit beoordelen;
 - templates voor berichten gebruiken;
+- zoekvragen verfijnen op basis van community/specialist/source-info;
+- terugvallen naar eerdere kanalen met verfijnde zoektermen;
 - go/no-go naar Spike05 voorbereiden.
 
 Niet in scope:
@@ -50,6 +52,14 @@ Niet in scope:
 - publieke marktplaats;
 - claims richting klant dat een onderdeel zeker gevonden wordt.
 
+## Specification refinement loop
+
+Spike04 is geen lineair kanaalpad. Wanneer een kanaal betere specificatie oplevert, keren we bewust terug naar eerdere kanalen.
+
+```text
+originele aanvraag -> kanaalronde -> nieuwe specificatie -> refined search -> betere leadbeoordeling
+```
+
 ## Definition of done
 
 Spike04 is klaar wanneer:
@@ -57,6 +67,8 @@ Spike04 is klaar wanneer:
 - minimaal 2 sourcing-ready cases zijn doorzocht;
 - per case minimaal 5 kanaalpogingen zijn gelogd;
 - per poging zoekterm, bron, resultaat en vervolgactie zijn genoteerd;
+- nieuwe specificaties zijn vastgelegd wanneer ze gevonden worden;
+- minstens één refined search is uitgevoerd wanneer de oorspronkelijke zoekvraag aantoonbaar verbeterd werd;
 - er minstens één bruikbare lead of duidelijk bewijs van non-match is gevonden;
 - er een go/no-go-beslissing ligt voor Spike05.
 
@@ -66,6 +78,7 @@ Spike04 is klaar wanneer:
 01-scope/spike04-scope.md
 02-research/source-channel-matrix.md
 03-process/manual-sourcing-sop.md
+03-process/specification-refinement-loop.md
 04-templates/message-templates.md
 05-testplan/testcases.md
 05-testplan/sourcing-log-template.csv
