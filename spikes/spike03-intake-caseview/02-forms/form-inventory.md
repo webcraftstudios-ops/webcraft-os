@@ -16,25 +16,25 @@ Vul hier de echte formulierlinks en redirectinstellingen in vóór de test.
 ### Formulier 1 naar formulier 2
 
 ```text
-<FORM_2_URL>?flow_id=@flow_id
+[<FORM_2_URL>](https://tally.so/r/KYOJgg)?flow_id=@flow_id
 ```
 
 ### Formulier 2 naar formulier 3
 
 ```text
-<FORM_3_URL>?flow_id=@flow_id
+[<FORM_3_URL>](https://tally.so/r/A7ab0o)?flow_id=@flow_id
 ```
 
 ### Formulier 3 naar formulier 4
 
 ```text
-<FORM_4_URL>?flow_id=@flow_id
+[<FORM_4_URL>](https://tally.so/r/VLq1yN)?flow_id=@flow_id
 ```
 
 ### Formulier 4 naar eindpagina
 
 ```text
-<THANK_YOU_URL>?flow_id=@flow_id
+[<THANK_YOU_URL>](https://classic-carparts.netlify.app)?flow_id=@flow_id
 ```
 
 De laatste redirect mag ook zonder `flow_id` wanneer de eindpagina niets meer hoeft te verwerken, maar voor debugging is behoud van `flow_id` nuttig.
