@@ -1,0 +1,4 @@
+flow_id,person_id,car_id,ad_id,consent_id,person_complete,car_complete,ad_complete,consent_complete,case_complete,status,next_action,missing_fields,source_quality,notes,created_at
+cpf_flow_test_012,person_test_012,car_test_012,ad_test_012,consent_test_012,yes,yes,yes,yes,yes,ready_for_source_check,start_source_check,,sufficient,complete correct test case,
+cpf_flow_test_013,person_test_013,car_test_013,,,yes,yes,no,no,no,needs_info,complete_missing_steps,"ad, consent",insufficient,stopped halfway,
+cpf_flow_test_014,person_test_014,car_test_014,ad_test_014,consent_test_014,yes,yes,no,yes,no,needs_info,complete_missing_steps,part_description_detail,insufficient,part request too vague,
