@@ -3,7 +3,7 @@
 ## Status
 
 ```text
-status: marketplace_search_done
+status: community_forum_search_done
 started_at: 2026-06-26
 last_updated_at: 2026-06-26
 flow_id: 7Xo88NP
@@ -61,7 +61,7 @@ Alfa Romeo Spider Series 4 Nardi steering wheel
 |---|---|---|---|
 | 1 | Google brede search | oriënteren op termen, varianten, specialisten | done |
 | 2 | Marketplace | eBay/Marktplaats/2dehands kandidaten | done |
-| 3 | Community/forum | Alfa Romeo Spider/Nardi kennis | pending |
+| 3 | Community/forum | Alfa Romeo Spider/Nardi kennis | done |
 | 4 | Specialist | Nardi/Alfa classic specialist contacteren | pending |
 | 5 | Breaker/parts supplier | gebruikte delen of stuur/naaf | pending |
 
@@ -154,6 +154,60 @@ best_lead_score: 1
 next_action: ga door naar community/forum of specialistvraag
 ```
 
+## Kanaalpoging 3 — Community/forum search
+
+### Zoekdoel
+
+Controleren of er geschikte Alfa-communitykanalen bestaan om deze vraag gericht te stellen zonder persoonsgegevens van de aanvrager te delen.
+
+### Queries uitgevoerd
+
+```text
+Alfa Romeo Spider community forum 105 115 owners club
+Alfa Romeo 105 115 Spider forum owners club parts
+Alfa Romeo Spider owners club forum parts
+Alfa Romeo forum steering wheel Nardi Spider
+Alfa Romeo Spider Nardi boss kit forum
+Nardi steering wheel boss kit Alfa Romeo Spider 105 115
+Alfa Romeo owners club forum Spider parts Nardi steering wheel
+AlfaBB Alfa Romeo Spider forum parts
+Facebook group Alfa Romeo Spider 105 115 parts
+```
+
+### Bevindingen
+
+| Community | Type | Bevinding | Lead score | Actie |
+|---|---|---|---:|---|
+| Alfa Romeo Owners Club UK (AROC) | club/community | Heeft Community, Area Sections, Model Registers en een ledenforum. Site vermeldt model-register expertise en contactgegevens. | 3 | Geschikt voor vraag naar juiste Nardi-naaf/variant; mogelijk lidmaatschap nodig. |
+| AROC Forum Index | forum | Forum is gelinkt vanuit members-sectie. Toegang lijkt leden/login-afhankelijk. | 2 | Alleen bruikbaar als account/lidmaatschap beschikbaar is. |
+| AlfaOwner forum | community/forum candidate | Komt als externe Alfa-communitylink naar voren, maar directe opening via tool lukte niet. | 2 | Manueel in browser controleren. |
+| AlfaBB | community/forum candidate | Bekende Alfa-community; directe toegang via tool geblokkeerd/niet leesbaar. | 2 | Manueel in browser controleren; mogelijk hoge waarde voor 105/115 kennis. |
+| Facebookgroepen | social/community | Via geïndexeerde zoekresultaten geen betrouwbare concrete groep bevestigd. | 1 | Alleen manueel via Facebook zoeken; niet als citeerbare lead loggen. |
+
+### Conclusie kanaal 3
+
+Community/forum search leverde geen directe productlead op, maar wel een duidelijke community-route:
+
+```text
+AROC is de beste eerste communitytarget.
+De vraag moet niet zijn “heeft iemand een Nardi stuurwiel?”, maar eerst:
+“Welke Nardi wheel + hub/boss/adaptor past correct op een Alfa Romeo Spider 1990 / Series 4 / 105-115?”
+```
+
+### Aanbevolen communityvraag
+
+```text
+For a 1990 Alfa Romeo Spider Series 4 / 105-115, which Nardi steering wheel diameter and boss/hub/adaptor setup is correct? I am trying to verify compatibility before looking for a used or NOS Nardi wheel. Any part numbers, photos or supplier references would help.
+```
+
+### Beslissing na kanaal 3
+
+```text
+community_result: source_route_found_no_product_lead
+best_lead_score: 3
+next_action: specialistvraag voorbereiden met AROC/Nardi/Alfa-specialist inputfocus
+```
+
 ## Belangrijkste blocking issue
 
 ```text
@@ -167,14 +221,14 @@ max_active_search_time: 90 minuten
 stop bij: lead_score >= 4, 5 kanalen zonder match, of blokkerende ontbrekende info
 ```
 
-## Tussenresultaat na kanaal 2
+## Tussenresultaat na kanaal 3
 
 ```text
-active_search_time: 35 minuten
-channels_checked: 2
-leads_found: 0 harde productleads, 3 specialist/source leads
+active_search_time: 50 minuten
+channels_checked: 3
+leads_found: 0 harde productleads, 4 specialist/community source leads
 best_lead_score: 3
 first_response_time: n.v.t.
 blocking_issues: naaf/hub/diameter/variant ontbreken
-recommended_next_action: community/forum check of specialistvraag voorbereiden
+recommended_next_action: kanaal 4 specialistvraag voorbereiden en gericht contact opnemen
 ```
