@@ -3,7 +3,7 @@
 ## Status
 
 ```text
-status: specialist_search_done
+status: channel_1b_google_refined_done
 started_at: 2026-06-26
 last_updated_at: 2026-06-26
 flow_id: 7Xo88NP
@@ -63,6 +63,8 @@ Alfa Romeo Spider Series 4 Nardi steering wheel
 | 2 | Marketplace | eBay/Marktplaats/2dehands kandidaten | done |
 | 3 | Community/forum | Alfa Romeo Spider/Nardi kennis | done |
 | 4 | Specialist | Nardi/Alfa classic specialist contacteren | done |
+| 1b | Google refined | refined search na specialist-informatie | done |
+| 2b | Marketplace refined | refined marketplace search | pending |
 | 5 | Breaker/parts supplier | gebruikte delen of stuur/naaf | pending |
 
 ## Kanaalpoging 1 — Google brede search
@@ -297,6 +299,63 @@ Alfa Romeo Spider 115 Nardi Classico hub
 Nardi 70mm PCD Alfa Romeo Spider hub adapter
 ```
 
+## Channel 1b — Google refined search
+
+### Zoekdoel
+
+De Google-search opnieuw uitvoeren met de verbeterde specificatie uit kanaal 4. Doel: niet opnieuw breed zoeken naar “Nardi stuurwiel”, maar controleren of de combinatie `Spider Series 4 / 105-115 + Nardi + hub/boss/adaptor` betere bronnen of leads oplevert.
+
+### Queries uitgevoerd
+
+```text
+Alfa Romeo Spider Series 4 Nardi hub boss kit
+Alfa Romeo Spider 105 115 Nardi hub adapter
+Nardi Personal hub Alfa Romeo Spider 1990
+Nardi steering wheel boss kit Alfa Romeo Spider 1968 1994
+Alfa Romeo Spider 115 Nardi Classico hub
+Nardi 70mm PCD Alfa Romeo Spider hub adapter
+```
+
+### Bevindingen
+
+| Bron | Type | Bevinding | Lead score | Actie |
+|---|---|---|---:|---|
+| Alfa Romeo Spider modelcontext | reference | Refined terms bevestigen dat 1990 binnen 105/115 Spider-context valt en dat Series 4 vanaf 1990/91 relevant is; markt/regio kan bepalen of 1990 als Series 3 of 4 wordt gezien. | 2 | Intake moet markt/regio of chassis/context vragen als exact Series 4 cruciaal is. |
+| Nardi-Personal adapter product | compatibility source | Adapter `4300.00.000X` laat Nardi/Personal steering wheels monteren op competitor hub adapters met 70 mm PCD. Geen directe Alfa Spider-fit bevestigd. | 4 | Sterke specificatiebron: zoek niet alleen wiel, maar wiel + 70 mm PCD/hub/boss compatibiliteit. |
+| Nardi-Personal hubs/adapters | specialist/source | Hubs & Adapters-categorie heeft twee producten: `Adapters – 4300.00.000X` en `Hubs`, beide price on request. | 4 | Specialistcontact is nodig voor Alfa Spider hub/boss-fitment. |
+| Nardi-Personal steering wheels | specialist/catalogus | Catalogus toont 133 steering wheels met filters op diameter en designlijn. | 4 | Vraag moet diameter/designlijn verplicht gaan onderscheiden. |
+| Alfaholics | Alfa-specialist/source | Site toont `105 & 115 Spider` als parts-modelcategorie en geeft contactgegevens. | 4 | Geschikt om 1968-1994 Spider-compatibiliteit praktisch te laten bevestigen. |
+
+### Analyse refined search
+
+Refined Google search verbeterde de bronkwaliteit, maar leverde nog geen harde productlead op.
+
+De belangrijkste verbetering is inhoudelijk:
+
+```text
+Origineel zoeken: Nardi stuurwiel Alfa Spider
+Refined zoeken: Nardi stuurwiel + hub/boss/adaptor + 105/115/Series 4 + 70 mm PCD
+```
+
+Hierdoor is duidelijker geworden dat Classic Parts Finder bij dit type aanvraag minstens twee subvragen moet behandelen:
+
+```text
+1. Welk Nardi-stuur past esthetisch/technisch?
+2. Welke hub/boss/adaptor maakt montage op deze Alfa Spider mogelijk?
+```
+
+### Beslissing na channel 1b
+
+```text
+refinement_source: kanaal 4 specialist search
+new_terms: Series 4, 105/115 Spider, hub, boss, adaptor, 70 mm PCD
+channels_retried: Google
+lead_score_before: 3-4 source leads, 0 product leads
+lead_score_after: 4 source leads, 0 product leads
+was_search_improved: yes, inhoudelijk; no, directe productlead
+next_action: channel_2b_marketplace_refined of eerst specialistcontact voorbereiden
+```
+
 ## Belangrijkste blocking issue
 
 ```text
@@ -310,14 +369,15 @@ max_active_search_time: 90 minuten
 stop bij: lead_score >= 4, 5 kanalen zonder match, of blokkerende ontbrekende info
 ```
 
-## Tussenresultaat na kanaal 4
+## Tussenresultaat na channel 1b
 
 ```text
-active_search_time: 70 minuten
-channels_checked: 4
-leads_found: 0 harde productleads, 2 sterke specialist/source leads, 4 totale source/community leads
+active_search_time: 83 minuten
+channels_checked: 5 incl. refined Google
+leads_found: 0 harde productleads, 4 sterke specialist/source leads
 best_lead_score: 4
 first_response_time: n.v.t.
 blocking_issues: naaf/hub/diameter/variant ontbreken
-recommended_next_action: channel_1b_google_refined + channel_2b_marketplace_refined
+specification_refinement_done: yes
+recommended_next_action: channel_2b_marketplace_refined, maar strak max 7 minuten binnen 90-minutenlimiet
 ```
