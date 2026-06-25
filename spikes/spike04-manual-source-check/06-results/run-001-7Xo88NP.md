@@ -3,7 +3,7 @@
 ## Status
 
 ```text
-status: community_forum_search_done
+status: specialist_search_done
 started_at: 2026-06-26
 last_updated_at: 2026-06-26
 flow_id: 7Xo88NP
@@ -62,7 +62,7 @@ Alfa Romeo Spider Series 4 Nardi steering wheel
 | 1 | Google brede search | oriënteren op termen, varianten, specialisten | done |
 | 2 | Marketplace | eBay/Marktplaats/2dehands kandidaten | done |
 | 3 | Community/forum | Alfa Romeo Spider/Nardi kennis | done |
-| 4 | Specialist | Nardi/Alfa classic specialist contacteren | pending |
+| 4 | Specialist | Nardi/Alfa classic specialist contacteren | done |
 | 5 | Breaker/parts supplier | gebruikte delen of stuur/naaf | pending |
 
 ## Kanaalpoging 1 — Google brede search
@@ -208,6 +208,95 @@ best_lead_score: 3
 next_action: specialistvraag voorbereiden met AROC/Nardi/Alfa-specialist inputfocus
 ```
 
+## Kanaalpoging 4 — Specialist search
+
+### Zoekdoel
+
+Niet alleen zoeken naar voorraad, maar vooral de technische specificatie valideren:
+
+- welke Nardi-lijn/diameter logisch is;
+- welke hub/boss/adaptor nodig is;
+- of Spider 1990 beter als Series 4, 105/115 Spider of 1968-1994 Spider moet worden gevraagd;
+- of er een passend nieuw/repro/NOS/used alternatief bestaat.
+
+### Queries uitgevoerd
+
+```text
+Alfa Romeo Spider 1990 Nardi steering wheel hub boss kit specialist
+Alfa Romeo Spider 105 115 Nardi boss kit steering wheel specialist
+Nardi Personal hub adapter Alfa Romeo Spider 105 115
+Alfa Romeo Spider 1990 steering wheel boss kit Nardi
+Classic Alfa steering wheel boss Alfa Spider 1990 Nardi
+Alfaholics Nardi steering wheel Alfa Romeo Spider hub boss
+```
+
+### Bevindingen
+
+| Specialist | Type | Bevinding | Lead score | Actie |
+|---|---|---|---:|---|
+| Nardi-Personal | fabrikant/specialist | Officiële Nardi-Personal site heeft 133 steering-wheel producten, filters op diameter en design, en aparte `Hubs & Adapters` producten. Contactgegevens zijn beschikbaar. | 4 | Beste specialist voor compatibiliteit en Nardi-variant/adaptorvraag. |
+| Nardi-Personal hubs/adapters | fabrikant/specialist | Hubs & Adapters-categorie bevat `Adapters – 4300.00.000X` en `Hubs`, prijs op aanvraag. Geen directe Alfa Spider-fit bevestigd. | 4 | Vraag expliciet naar Alfa Romeo Spider 1990 / Series 4 / 105-115 compatibiliteit. |
+| Alfaholics | Alfa-specialist | Alfaholics toont `105 & 115 Spider` parts voor 1968-1994 en vermeldt contactgegevens. | 4 | Beste Alfa-specialist voor 105/115 Spider-context en praktische montagevraag. |
+| Classic Alfa / andere Alfa-specialisten | kandidaat-specialist | Via beschikbare search/tooling geen betrouwbare productpagina bevestigd. | 2 | Later manueel checken; niet als harde lead tellen. |
+
+### Conclusie kanaal 4
+
+Specialist search leverde geen harde productmatch op, maar wel twee sterke specialistleads:
+
+```text
+1. Nardi-Personal: officiële bron voor stuurwielvariant + hubs/adapters
+2. Alfaholics: Alfa 105/115 Spider specialist voor bouwjaar/modelcontext en montageadvies
+```
+
+Belangrijk: kanaal 4 verhoogt de leadscore van 3 naar 4, maar als specialist/source lead, niet als directe productlead.
+
+### Aanbevolen specialistvraag
+
+```text
+For a 1990 Alfa Romeo Spider Series 4 / 105-115, I am trying to identify a correct Nardi steering wheel setup before searching for a used or NOS wheel.
+
+Could you confirm:
+1. which Nardi steering wheel diameter/style is suitable;
+2. which hub/boss/adaptor is required;
+3. whether 105/115 Spider or Series 4 is the correct compatibility reference;
+4. whether you can supply a suitable wheel/hub combination or recommend a part number/source?
+```
+
+### Beslissing na kanaal 4
+
+```text
+specialist_result: strong_specialist_source_leads_found
+best_lead_score: 4
+product_lead_found: no
+specification_improved: yes
+next_action: activate refinement loop, then run channel_1b_google_refined and channel_2b_marketplace_refined
+```
+
+## Specification refinement trigger
+
+Kanaal 4 activeert officieel de refinement loop.
+
+### Nieuwe specificatie
+
+```text
+zoek niet alleen op Nardi stuurwiel;
+zoek op Nardi steering wheel + hub/boss/adaptor;
+gebruik Alfa Romeo Spider Series 4 én 105/115 Spider;
+controleer 1968-1994 Spider-compatibiliteit;
+Nardi diameter/designlijn blijft open punt.
+```
+
+### Nieuwe refined zoektermen
+
+```text
+Alfa Romeo Spider Series 4 Nardi hub boss kit
+Alfa Romeo Spider 105 115 Nardi hub adapter
+Nardi Personal hub Alfa Romeo Spider 1990
+Nardi steering wheel boss kit Alfa Romeo Spider 1968 1994
+Alfa Romeo Spider 115 Nardi Classico hub
+Nardi 70mm PCD Alfa Romeo Spider hub adapter
+```
+
 ## Belangrijkste blocking issue
 
 ```text
@@ -221,14 +310,14 @@ max_active_search_time: 90 minuten
 stop bij: lead_score >= 4, 5 kanalen zonder match, of blokkerende ontbrekende info
 ```
 
-## Tussenresultaat na kanaal 3
+## Tussenresultaat na kanaal 4
 
 ```text
-active_search_time: 50 minuten
-channels_checked: 3
-leads_found: 0 harde productleads, 4 specialist/community source leads
-best_lead_score: 3
+active_search_time: 70 minuten
+channels_checked: 4
+leads_found: 0 harde productleads, 2 sterke specialist/source leads, 4 totale source/community leads
+best_lead_score: 4
 first_response_time: n.v.t.
 blocking_issues: naaf/hub/diameter/variant ontbreken
-recommended_next_action: kanaal 4 specialistvraag voorbereiden en gericht contact opnemen
+recommended_next_action: channel_1b_google_refined + channel_2b_marketplace_refined
 ```
