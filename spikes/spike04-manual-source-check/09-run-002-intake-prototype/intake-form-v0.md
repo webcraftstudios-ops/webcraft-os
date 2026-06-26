@@ -74,7 +74,7 @@ Gaat het om links/rechts, voor/achter, volledig paneel of reparatiestuk, chroom 
 ### Verlichting / elektrisch
 
 ```text
-Staat er een merk of partnummer op? Is het links/rechts, voor/achter, lens/behuizing/reflector, 6V/12V, en welk connectortype?
+Zoek je alleen de lens/het glas, de reflector/behuizing, of de volledige koplamp/unit? Staat er een merk of partnummer op het bestaande onderdeel? Is het links/rechts, voor/achter, 6V/12V, welk lamptype, EU/US of LHD/RHD?
 ```
 
 ### Motor / brandstof
@@ -117,6 +117,21 @@ Merk van instrument, schaal/eenheden, kleur wijzerplaat, partnummer achterzijde,
 
 ```text
 Beschrijf zo concreet mogelijk waar het onderdeel zit, wat het doet, wat kapot/ontbrekend is, en voeg liefst een foto of oud onderdeelnummer toe.
+```
+
+## Run 002 update — lighting_electrical
+
+Run 002 toonde dat de vorige helper voor `Verlichting / elektrisch` nog te breed was. De helper moet expliciet onderscheid maken tussen:
+
+```text
+lens/glas
+reflector/behuizing
+complete koplamp/unit
+partnummer/merk
+links/rechts en voor/achter
+6V/12V
+lamptype
+EU/US of LHD/RHD
 ```
 
 ## UX-regel
