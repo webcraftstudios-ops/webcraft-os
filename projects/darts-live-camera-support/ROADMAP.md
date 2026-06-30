@@ -1,22 +1,65 @@
 # Roadmap — Darts Live Camera Support
 
-## Fase 0 — Projectkader
+## Fase 0 — Projectkader als sprints
 
 Doel: voorkomen dat dit een te groot R&D-project wordt.
 
-Taken:
+Fase 0 is omgezet naar vier korte sprints. Zie ook `SPRINTS.md`.
 
-- doelgroep kiezen;
-- MVP-scope vastleggen;
-- technische risico’s scheiden van verkoopbare demo;
-- projectstructuur opzetten.
+### Sprint 0.1 — Commerciële scope
+
+Doel: bepalen voor wie de eerste versie bedoeld is en waarom die doelgroep zou betalen.
 
 Output:
 
-- README
-- projectprompt
-- MVP-specificatie
-- eerste GitHub issue
+- primaire doelgroep;
+- probleemdefinitie;
+- eerste pitchzin;
+- betaalhypothese.
+
+### Sprint 0.2 — MVP-scope
+
+Doel: vastleggen wat de eerste demo absoluut moet kunnen zonder afhankelijk te zijn van perfecte AI-detectie.
+
+Output:
+
+- MVP-functielijst;
+- demo-scenario;
+- niet-bouwen-lijst;
+- eerste user flow.
+
+### Sprint 0.3 — Technische projectkeuze
+
+Doel: technische basis kiezen die snel bouwbaar is en later camera/computer vision kan dragen.
+
+Output:
+
+- stackbeslissing;
+- architectuurschets;
+- datamodel v0;
+- camera-aanpak fase 1.
+
+### Sprint 0.4 — Demo- en validatieplan
+
+Doel: bepalen hoe de eerste demo getest wordt bij echte gebruikers of kopers.
+
+Output:
+
+- demo-script;
+- validatievragen;
+- feedbackcriteria;
+- eerste prijs-/pakketopties.
+
+### Fase 0 exitcriteria
+
+Fase 0 is klaar wanneer volgende beslissingen genomen zijn:
+
+- primaire doelgroep;
+- exacte MVP-scope;
+- technische stack;
+- eerste demo-flow;
+- expliciete niet-bouwen-lijst;
+- go/no-go naar Fase 1: Scoreboard Prototype.
 
 ## Fase 1 — Scoreboard Prototype
 
@@ -142,7 +185,7 @@ Camera, mount, mini-pc en software als pakket.
 
 ## Eerstvolgende bouwstap
 
-Maak een simpele webapp met:
+Rond Fase 0 af via de vier sprints. Ga pas daarna naar de simpele webapp met:
 
 - twee spelers;
 - 501 scorelogica;
