@@ -1,5 +1,14 @@
-import type { GameType } from '@/domain/types';
+import type { GameType, Player } from '@/domain/types';
 
 export const defaultGameType: GameType = '501';
 
-export const demoPlayers = ['Player 1', 'Player 2'];
+export const demoPlayers: Player[] = [
+  {
+    id: 'player-1',
+    name: 'Player 1',
+  },
+  {
+    id: 'player-2',
+    name: 'Player 2',
+  },
+];
