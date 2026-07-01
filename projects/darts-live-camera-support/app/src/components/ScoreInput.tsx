@@ -6,11 +6,13 @@ import { applyTurn, validateTurnScore } from '@/domain/scoring';
 
 export type ScoreInputProps = {
   state: MatchState;
+  pendingSnapshotId?: string | null;
   onStateChange: (state: MatchState) => void;
   onMessageChange?: (message: string | null) => void;
+  onTurnConfirmed?: () => void;
 };
 
-export function ScoreInput({ state, onStateChange, onMessageChange }: ScoreInputProps) {
+export function ScoreInput({ state, pendingSnapshotId, onStateChange, onMessageChange, onTurnConfirmed }: ScoreInputProps) {
   const [scoreInput, setScoreInput] = useState('');
   const currentPlayer = state.players.find((player) => player.id === state.match.currentPlayerId);
   const isFinished = state.match.status === 'finished';
@@ -27,15 +29,18 @@ export function ScoreInput({ state, onStateChange, onMessageChange }: ScoreInput
     }
 
     try {
-      const result = applyTurn({ state, score });
+      const result = applyTurn({ state, score, snapshotId: pendingSnapshotId ?? undefined });
       const message = result.turn.isBust
         ? `Bust: ${currentPlayer?.name ?? 'Player'} stays on ${result.turn.scoreAfter}.`
         : result.state.match.status === 'finished'
           ? `${currentPlayer?.name ?? 'Player'} finished the leg.`
-          : null;
+          : pendingSnapshotId
+            ? `Score confirmed with image ${pendingSnapshotId}.`
+            : null;
 
       onStateChange(result.state);
       onMessageChange?.(message);
+      onTurnConfirmed?.();
       setScoreInput('');
     } catch (error) {
       onMessageChange?.(error instanceof Error ? error.message : 'Could not apply score.');
@@ -51,6 +56,7 @@ export function ScoreInput({ state, onStateChange, onMessageChange }: ScoreInput
       <p className="mt-2 text-sm text-slate-400">
         Enter the total score for one turn. Valid range: 0 to 180.
       </p>
+      <p className="mt-2 text-sm text-slate-400">Pending image: {pendingSnapshotId ?? '-'}</p>
 
       <form className="mt-6 flex flex-col gap-3 md:flex-row" onSubmit={handleSubmit}>
         <input
