@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { CorrectionControls } from '@/components/CorrectionControls';
 import { MatchSetup } from '@/components/MatchSetup';
+import { MockImagePanel } from '@/components/MockImagePanel';
 import { ScoreInput } from '@/components/ScoreInput';
 import { Scoreboard } from '@/components/Scoreboard';
 import { TurnHistory } from '@/components/TurnHistory';
@@ -11,10 +12,22 @@ import type { MatchState } from '@/domain/types';
 export default function HomePage() {
   const [matchState, setMatchState] = useState<MatchState | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [pendingSnapshotId, setPendingSnapshotId] = useState<string | null>(null);
+  const lastSnapshotId = matchState?.turns.at(-1)?.snapshotId ?? null;
 
   function handleStartMatch(state: MatchState) {
     setMatchState(state);
     setMessage(null);
+    setPendingSnapshotId(null);
+  }
+
+  function handleCreateMockImage() {
+    setPendingSnapshotId(`mock-${crypto.randomUUID().slice(0, 8)}`);
+    setMessage('Mock image prepared for the next confirmed score.');
+  }
+
+  function handleTurnConfirmed() {
+    setPendingSnapshotId(null);
   }
 
   return (
@@ -41,10 +54,18 @@ export default function HomePage() {
         {matchState ? (
           <>
             <Scoreboard state={matchState} />
+            <MockImagePanel
+              pendingSnapshotId={pendingSnapshotId}
+              lastSnapshotId={lastSnapshotId}
+              onCreateSnapshot={handleCreateMockImage}
+              onClearSnapshot={() => setPendingSnapshotId(null)}
+            />
             <ScoreInput
               state={matchState}
+              pendingSnapshotId={pendingSnapshotId}
               onStateChange={setMatchState}
               onMessageChange={setMessage}
+              onTurnConfirmed={handleTurnConfirmed}
             />
             <CorrectionControls
               state={matchState}
