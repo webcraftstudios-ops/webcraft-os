@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { MatchSetup } from '@/components/MatchSetup';
 import { ScoreInput } from '@/components/ScoreInput';
 import { Scoreboard } from '@/components/Scoreboard';
+import { TurnHistory } from '@/components/TurnHistory';
 import type { MatchState } from '@/domain/types';
 
 export default function HomePage() {
@@ -44,6 +45,7 @@ export default function HomePage() {
               onStateChange={setMatchState}
               onMessageChange={setMessage}
             />
+            <TurnHistory state={matchState} />
           </>
         ) : (
           <MatchSetup onStartMatch={handleStartMatch} />
