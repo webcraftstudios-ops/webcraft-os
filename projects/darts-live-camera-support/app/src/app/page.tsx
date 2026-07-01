@@ -31,51 +31,60 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 px-6 py-10 text-slate-100">
-      <section className="mx-auto flex max-w-5xl flex-col gap-8">
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-8 shadow-xl">
-          <p className="text-sm uppercase tracking-[0.3em] text-slate-400">
-            Darts Live Camera Support
-          </p>
-          <h1 className="mt-4 text-4xl font-bold tracking-tight md:text-6xl">
-            Scoreboard Prototype
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg text-slate-300">
-            Phase 1 starts with a browser-based 301/501 scoreboard. Camera and image recognition stay out of scope until the scoreboard flow is demoable.
-          </p>
-        </div>
-
-        {message ? (
-          <div className="rounded-xl border border-slate-700 bg-slate-900 px-5 py-4 text-sm text-slate-200">
-            {message}
+    <main className="min-h-screen bg-black px-4 py-6 text-white md:px-8">
+      <section className="mx-auto flex max-w-7xl flex-col gap-6">
+        {!matchState ? (
+          <div className="mx-auto w-full max-w-3xl pt-10">
+            <div className="mb-6 rounded-3xl border border-zinc-800 bg-zinc-950 p-8 shadow-2xl">
+              <p className="text-sm font-semibold uppercase tracking-[0.35em] text-zinc-500">
+                Darts Live Camera Support
+              </p>
+              <h1 className="mt-4 text-5xl font-black uppercase tracking-tight text-white">
+                Scoreboard Prototype
+              </h1>
+              <p className="mt-4 text-lg text-zinc-400">
+                Start a 301 or 501 demo match. Camera and image recognition stay out of scope for this prototype.
+              </p>
+            </div>
+            <MatchSetup onStartMatch={handleStartMatch} />
           </div>
-        ) : null}
-
-        {matchState ? (
-          <>
-            <Scoreboard state={matchState} />
-            <MockImagePanel
-              pendingSnapshotId={pendingSnapshotId}
-              lastSnapshotId={lastSnapshotId}
-              onCreateSnapshot={handleCreateMockImage}
-              onClearSnapshot={() => setPendingSnapshotId(null)}
-            />
-            <ScoreInput
-              state={matchState}
-              pendingSnapshotId={pendingSnapshotId}
-              onStateChange={setMatchState}
-              onMessageChange={setMessage}
-              onTurnConfirmed={handleTurnConfirmed}
-            />
-            <CorrectionControls
-              state={matchState}
-              onStateChange={setMatchState}
-              onMessageChange={setMessage}
-            />
-            <TurnHistory state={matchState} />
-          </>
         ) : (
-          <MatchSetup onStartMatch={handleStartMatch} />
+          <>
+            {message ? (
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-950 px-5 py-4 text-sm font-semibold text-zinc-200">
+                {message}
+              </div>
+            ) : null}
+
+            <Scoreboard state={matchState} />
+
+            <section className="grid gap-5 lg:grid-cols-[1fr_1fr]">
+              <div className="grid gap-5">
+                <ScoreInput
+                  state={matchState}
+                  pendingSnapshotId={pendingSnapshotId}
+                  onStateChange={setMatchState}
+                  onMessageChange={setMessage}
+                  onTurnConfirmed={handleTurnConfirmed}
+                />
+                <CorrectionControls
+                  state={matchState}
+                  onStateChange={setMatchState}
+                  onMessageChange={setMessage}
+                />
+              </div>
+
+              <div className="grid gap-5">
+                <MockImagePanel
+                  pendingSnapshotId={pendingSnapshotId}
+                  lastSnapshotId={lastSnapshotId}
+                  onCreateSnapshot={handleCreateMockImage}
+                  onClearSnapshot={() => setPendingSnapshotId(null)}
+                />
+                <TurnHistory state={matchState} />
+              </div>
+            </section>
+          </>
         )}
       </section>
     </main>
