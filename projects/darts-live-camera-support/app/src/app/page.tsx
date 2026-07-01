@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { MatchSetup } from '@/components/MatchSetup';
+import { Scoreboard } from '@/components/Scoreboard';
 import type { MatchState } from '@/domain/types';
 
 export default function HomePage() {
@@ -22,33 +23,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        {matchState ? (
-          <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl">
-            <p className="text-xs uppercase tracking-wide text-slate-500">Active match</p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-100">
-              {matchState.match.gameType} leg started
-            </h2>
-            <div className="mt-5 grid gap-3 md:grid-cols-2">
-              {matchState.players.map((player) => {
-                const score = matchState.playerScores.find((item) => item.playerId === player.id);
-                const isCurrentPlayer = matchState.match.currentPlayerId === player.id;
-
-                return (
-                  <div
-                    className="rounded-xl border border-slate-800 bg-slate-950 p-5"
-                    key={player.id}
-                  >
-                    <p className="text-sm text-slate-400">{isCurrentPlayer ? 'Current player' : 'Player'}</p>
-                    <h3 className="mt-1 text-xl font-semibold text-slate-100">{player.name}</h3>
-                    <p className="mt-3 text-4xl font-bold text-slate-100">{score?.remainingScore}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        ) : (
-          <MatchSetup onStartMatch={setMatchState} />
-        )}
+        {matchState ? <Scoreboard state={matchState} /> : <MatchSetup onStartMatch={setMatchState} />}
       </section>
     </main>
   );
