@@ -2,11 +2,18 @@
 
 import { useState } from 'react';
 import { MatchSetup } from '@/components/MatchSetup';
+import { ScoreInput } from '@/components/ScoreInput';
 import { Scoreboard } from '@/components/Scoreboard';
 import type { MatchState } from '@/domain/types';
 
 export default function HomePage() {
   const [matchState, setMatchState] = useState<MatchState | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+
+  function handleStartMatch(state: MatchState) {
+    setMatchState(state);
+    setMessage(null);
+  }
 
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-slate-100">
@@ -23,7 +30,24 @@ export default function HomePage() {
           </p>
         </div>
 
-        {matchState ? <Scoreboard state={matchState} /> : <MatchSetup onStartMatch={setMatchState} />}
+        {message ? (
+          <div className="rounded-xl border border-slate-700 bg-slate-900 px-5 py-4 text-sm text-slate-200">
+            {message}
+          </div>
+        ) : null}
+
+        {matchState ? (
+          <>
+            <Scoreboard state={matchState} />
+            <ScoreInput
+              state={matchState}
+              onStateChange={setMatchState}
+              onMessageChange={setMessage}
+            />
+          </>
+        ) : (
+          <MatchSetup onStartMatch={handleStartMatch} />
+        )}
       </section>
     </main>
   );
