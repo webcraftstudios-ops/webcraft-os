@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { CorrectionControls } from '@/components/CorrectionControls';
 import { MatchSetup } from '@/components/MatchSetup';
 import { ScoreInput } from '@/components/ScoreInput';
 import { Scoreboard } from '@/components/Scoreboard';
@@ -41,6 +42,11 @@ export default function HomePage() {
           <>
             <Scoreboard state={matchState} />
             <ScoreInput
+              state={matchState}
+              onStateChange={setMatchState}
+              onMessageChange={setMessage}
+            />
+            <CorrectionControls
               state={matchState}
               onStateChange={setMatchState}
               onMessageChange={setMessage}
