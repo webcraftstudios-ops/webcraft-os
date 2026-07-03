@@ -31,18 +31,16 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-black px-4 py-6 text-white md:px-8">
+    <main className="min-h-screen px-4 py-6 text-[var(--dl-text)] md:px-8">
       <section className="mx-auto flex max-w-7xl flex-col gap-6">
         {!matchState ? (
           <div className="mx-auto w-full max-w-3xl pt-10">
-            <div className="mb-6 rounded-3xl border border-zinc-800 bg-zinc-950 p-8 shadow-2xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.35em] text-zinc-500">
-                Darts Live Camera Support
-              </p>
-              <h1 className="mt-4 text-5xl font-black uppercase tracking-tight text-white">
+            <div className="dl-card mb-6 p-8">
+              <p className="dl-kicker">Darts Live Camera Support</p>
+              <h1 className="mt-4 text-5xl font-black uppercase tracking-tight text-[var(--dl-text)]">
                 Scoreboard Prototype
               </h1>
-              <p className="mt-4 text-lg text-zinc-400">
+              <p className="mt-4 text-lg text-[var(--dl-muted)]">
                 Start a 301 or 501 demo match. Camera and image recognition stay out of scope for this prototype.
               </p>
             </div>
@@ -51,7 +49,7 @@ export default function HomePage() {
         ) : (
           <>
             {message ? (
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-950 px-5 py-4 text-sm font-semibold text-zinc-200">
+              <div className="dl-panel px-5 py-4 text-sm font-semibold text-[var(--dl-text)]">
                 {message}
               </div>
             ) : null}
