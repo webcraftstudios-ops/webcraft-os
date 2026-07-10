@@ -3,6 +3,9 @@
 import { FormEvent, useState } from 'react';
 import type { MatchState } from '@/domain/types';
 import { correctLastTurn, undoLastTurn, validateTurnScore } from '@/domain/scoring';
+import { Button } from '@/components/ui/Button';
+import { Panel } from '@/components/ui/Panel';
+import { TextField } from '@/components/ui/Field';
 
 export type CorrectionControlsProps = {
   state: MatchState;
@@ -58,14 +61,12 @@ export function CorrectionControls({ state, onStateChange, onMessageChange }: Co
   }
 
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl">
-      <p className="text-xs uppercase tracking-wide text-slate-500">Corrections</p>
-      <h2 className="mt-2 text-2xl font-semibold text-slate-100">Fix the last turn</h2>
-      <p className="mt-2 text-sm text-slate-400">
-        Correct or undo the most recent confirmed turn. This keeps the demo flow simple and auditable.
-      </p>
-
-      <div className="mt-5 rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm text-slate-300">
+    <Panel
+      description="Correct or undo the most recent confirmed turn. This keeps the demo flow simple and auditable."
+      kicker="Corrections"
+      title="Fix the last turn"
+    >
+      <div className="rounded-lg border border-[var(--dl-border)] bg-[var(--dl-bg)] p-4 text-sm text-[var(--dl-muted)]">
         {lastTurn ? (
           <p>
             Last turn: #{lastTurn.turnNumber}, score {lastTurn.confirmedScore}, after {lastTurn.scoreAfter}
@@ -76,33 +77,23 @@ export function CorrectionControls({ state, onStateChange, onMessageChange }: Co
       </div>
 
       <div className="mt-5 grid gap-3 md:grid-cols-[auto_1fr]">
-        <button
-          className="rounded-lg border border-slate-700 px-5 py-3 text-sm font-bold text-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={!hasTurns}
-          onClick={handleUndoLastTurn}
-          type="button"
-        >
+        <Button disabled={!hasTurns} onClick={handleUndoLastTurn} type="button" variant="secondary">
           Undo last turn
-        </button>
+        </Button>
 
         <form className="flex flex-col gap-3 md:flex-row" onSubmit={handleCorrectLastTurn}>
-          <input
-            className="min-w-0 flex-1 rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100"
+          <TextField
             disabled={!hasTurns}
             inputMode="numeric"
             onChange={(event) => setNewScore(event.target.value)}
             placeholder="New score for last turn"
             value={newScore}
           />
-          <button
-            className="rounded-lg bg-slate-100 px-5 py-3 text-sm font-bold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={!hasTurns}
-            type="submit"
-          >
+          <Button disabled={!hasTurns} type="submit">
             Correct score
-          </button>
+          </Button>
         </form>
       </div>
-    </section>
+    </Panel>
   );
 }

@@ -1,4 +1,8 @@
 import type { MatchState } from '@/domain/types';
+import { BigNumber } from '@/components/ui/BigNumber';
+import { Card } from '@/components/ui/Card';
+import { SectionLabel } from '@/components/ui/SectionLabel';
+import { StatBadge } from '@/components/ui/StatBadge';
 
 export type ScoreboardProps = {
   state: MatchState;
@@ -10,17 +14,15 @@ export function Scoreboard({ state }: ScoreboardProps) {
   const lastTurn = state.turns.at(-1);
 
   return (
-    <section className="dl-card overflow-hidden">
+    <Card className="overflow-hidden" tone="card">
       <header className="flex flex-col gap-4 border-b border-[var(--dl-border)] bg-[var(--dl-surface-strong)] px-6 py-5 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="dl-kicker">Darts Live Camera Support</p>
+          <SectionLabel>Darts Live Camera Support</SectionLabel>
           <h2 className="mt-2 text-3xl font-black uppercase tracking-wide text-[var(--dl-text)] md:text-5xl">
             {state.match.gameType} Live Scoreboard
           </h2>
         </div>
-        <div className="rounded-full border border-[var(--dl-border)] bg-[var(--dl-surface)] px-5 py-2 text-sm font-black uppercase tracking-[0.14em] text-[var(--dl-text)]">
-          {state.match.status}
-        </div>
+        <StatBadge>{state.match.status}</StatBadge>
       </header>
 
       <div className="grid min-h-[500px] gap-0 md:grid-cols-[1fr_300px_1fr]">
@@ -48,33 +50,29 @@ export function Scoreboard({ state }: ScoreboardProps) {
                 </h3>
               </div>
 
-              <p className="dl-score-font mt-8 text-[7.5rem] font-black leading-none tracking-tighter md:text-[11rem]">
-                {score?.remainingScore ?? state.match.startingScore}
-              </p>
+              <BigNumber className="mt-8 tracking-tighter" size="lg" value={score?.remainingScore ?? state.match.startingScore} />
             </article>
           );
         })}
 
         <aside className="order-first flex flex-col justify-between border-y border-[var(--dl-border)] bg-[var(--dl-surface)] p-6 text-center md:order-none md:border-x md:border-y-0">
           <div>
-            <p className="dl-kicker">Current turn</p>
+            <SectionLabel>Current turn</SectionLabel>
             <p className="mt-3 text-3xl font-black uppercase text-[var(--dl-text)]">
               {winner ? 'Finished' : currentPlayer?.name ?? 'Unknown'}
             </p>
           </div>
 
-          <div className="my-8 rounded-[var(--dl-radius-xl)] border border-[var(--dl-border)] bg-[var(--dl-bg)] p-5">
-            <p className="dl-kicker">Last throw</p>
-            <p className="dl-score-font mt-3 text-6xl font-black text-[var(--dl-text)]">
-              {lastTurn?.confirmedScore ?? '-'}
-            </p>
+          <div className="my-8 rounded-xl border border-[var(--dl-border)] bg-[var(--dl-bg)] p-5">
+            <SectionLabel>Last throw</SectionLabel>
+            <BigNumber className="mt-3" size="md" value={lastTurn?.confirmedScore ?? '-'} />
             <p className="mt-2 text-sm font-semibold text-[var(--dl-muted)]">
               {lastTurn ? (lastTurn.isBust ? 'Bust' : `After: ${lastTurn.scoreAfter}`) : 'No turns yet'}
             </p>
           </div>
 
-          <div className="rounded-[var(--dl-radius-lg)] border border-[var(--dl-border)] bg-[var(--dl-surface-strong)] p-4">
-            <p className="dl-kicker">Mode</p>
+          <div className="rounded-lg border border-[var(--dl-border)] bg-[var(--dl-surface-strong)] p-4">
+            <SectionLabel>Mode</SectionLabel>
             <p className="mt-2 text-xl font-black text-[var(--dl-text)]">TV Demo</p>
           </div>
         </aside>
@@ -83,6 +81,6 @@ export function Scoreboard({ state }: ScoreboardProps) {
       <footer className="border-t border-[var(--dl-border)] bg-[var(--dl-surface-strong)] px-6 py-4 text-center text-sm font-black uppercase tracking-[0.2em] text-[var(--dl-muted)]">
         Scoreboard prototype • Human-confirmed scoring • Camera-assisted later
       </footer>
-    </section>
+    </Card>
   );
 }
