@@ -25,15 +25,16 @@ export function Scoreboard({ state }: ScoreboardProps) {
         <StatBadge>{state.match.status}</StatBadge>
       </header>
 
-      <div className="grid min-h-[500px] gap-0 md:grid-cols-[1fr_300px_1fr]">
-        {state.players.map((player) => {
+      <div className="grid min-h-[500px] gap-0 md:grid-cols-[minmax(0,1fr)_300px_minmax(0,1fr)]">
+        {state.players.map((player, index) => {
           const score = state.playerScores.find((item) => item.playerId === player.id);
           const isCurrentPlayer = state.match.currentPlayerId === player.id;
           const isWinner = state.match.winnerPlayerId === player.id;
+          const columnClassName = index === 0 ? 'md:col-start-1' : 'md:col-start-3';
 
           return (
             <article
-              className={`relative flex min-h-[380px] flex-col justify-between overflow-hidden border-[var(--dl-border)] p-6 transition-all duration-200 md:p-8 ${
+              className={`relative flex min-h-[380px] min-w-0 flex-col justify-between overflow-hidden border-[var(--dl-border)] p-6 transition-all duration-200 md:row-start-1 md:p-8 ${columnClassName} ${
                 isCurrentPlayer
                   ? 'bg-[var(--dl-text)] text-[var(--dl-bg)] ring-4 ring-[var(--dl-primary)]'
                   : 'bg-[var(--dl-surface-strong)] text-[var(--dl-text)]'
@@ -55,7 +56,7 @@ export function Scoreboard({ state }: ScoreboardProps) {
           );
         })}
 
-        <aside className="order-first flex flex-col justify-between border-y border-[var(--dl-border)] bg-[var(--dl-surface)] p-6 text-center md:order-none md:border-x md:border-y-0">
+        <aside className="order-first flex flex-col justify-between border-y border-[var(--dl-border)] bg-[var(--dl-surface)] p-6 text-center md:order-none md:col-start-2 md:row-start-1 md:border-x md:border-y-0">
           <div>
             <SectionLabel>Current turn</SectionLabel>
             <p className="mt-3 text-3xl font-black uppercase text-[var(--dl-text)]">
