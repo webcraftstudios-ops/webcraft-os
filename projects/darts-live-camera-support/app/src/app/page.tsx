@@ -7,6 +7,8 @@ import { MockImagePanel } from '@/components/MockImagePanel';
 import { ScoreInput } from '@/components/ScoreInput';
 import { Scoreboard } from '@/components/Scoreboard';
 import { TurnHistory } from '@/components/TurnHistory';
+import { Card } from '@/components/ui/Card';
+import { SectionLabel } from '@/components/ui/SectionLabel';
 import type { MatchState } from '@/domain/types';
 
 export default function HomePage() {
@@ -35,23 +37,23 @@ export default function HomePage() {
       <section className="mx-auto flex max-w-7xl flex-col gap-6">
         {!matchState ? (
           <div className="mx-auto w-full max-w-3xl pt-10">
-            <div className="dl-card mb-6 p-8">
-              <p className="dl-kicker">Darts Live Camera Support</p>
+            <Card className="mb-6 p-8" tone="card">
+              <SectionLabel>Darts Live Camera Support</SectionLabel>
               <h1 className="mt-4 text-5xl font-black uppercase tracking-tight text-[var(--dl-text)]">
                 Scoreboard Prototype
               </h1>
               <p className="mt-4 text-lg text-[var(--dl-muted)]">
                 Start a 301 or 501 demo match. Camera and image recognition stay out of scope for this prototype.
               </p>
-            </div>
+            </Card>
             <MatchSetup onStartMatch={handleStartMatch} />
           </div>
         ) : (
           <>
             {message ? (
-              <div className="dl-panel px-5 py-4 text-sm font-semibold text-[var(--dl-text)]">
+              <Card className="px-5 py-4 text-sm font-semibold text-[var(--dl-text)]" tone="panel">
                 {message}
-              </div>
+              </Card>
             ) : null}
 
             <Scoreboard state={matchState} />

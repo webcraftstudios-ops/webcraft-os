@@ -2,6 +2,9 @@
 
 import { FormEvent, useState } from 'react';
 import type { GameType, MatchState } from '@/domain/types';
+import { Button } from '@/components/ui/Button';
+import { Panel } from '@/components/ui/Panel';
+import { SelectField, TextField } from '@/components/ui/Field';
 
 export type MatchSetupProps = {
   onStartMatch: (state: MatchState) => void;
@@ -49,49 +52,34 @@ export function MatchSetup({ onStartMatch }: MatchSetupProps) {
   }
 
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl">
-      <p className="text-xs uppercase tracking-wide text-slate-500">Match setup</p>
-      <h2 className="mt-2 text-2xl font-semibold text-slate-100">Start a new leg</h2>
-      <p className="mt-2 text-sm text-slate-400">Two players. 501 default. 301 optional.</p>
+    <Panel description="Two players. 501 default. 301 optional." kicker="Match setup" title="Start a new leg">
+      <form className="grid gap-5" onSubmit={handleSubmit}>
+        <TextField
+          label="Player 1"
+          onChange={(event) => setPlayerOneName(event.target.value)}
+          placeholder="Player 1"
+          value={playerOneName}
+        />
 
-      <form className="mt-6 grid gap-5" onSubmit={handleSubmit}>
-        <label className="grid gap-2 text-sm font-medium text-slate-300">
-          Player 1
-          <input
-            className="rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100"
-            value={playerOneName}
-            onChange={(event) => setPlayerOneName(event.target.value)}
-            placeholder="Player 1"
-          />
-        </label>
+        <TextField
+          label="Player 2"
+          onChange={(event) => setPlayerTwoName(event.target.value)}
+          placeholder="Player 2"
+          value={playerTwoName}
+        />
 
-        <label className="grid gap-2 text-sm font-medium text-slate-300">
-          Player 2
-          <input
-            className="rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100"
-            value={playerTwoName}
-            onChange={(event) => setPlayerTwoName(event.target.value)}
-            placeholder="Player 2"
-          />
-        </label>
+        <SelectField
+          label="Starting score"
+          onChange={(event) => setGameType(event.target.value as GameType)}
+          value={gameType}
+        >
+          <option value="501">501</option>
+          <option value="301">301</option>
+        </SelectField>
 
-        <label className="grid gap-2 text-sm font-medium text-slate-300">
-          Starting score
-          <select
-            className="rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100"
-            value={gameType}
-            onChange={(event) => setGameType(event.target.value as GameType)}
-          >
-            <option value="501">501</option>
-            <option value="301">301</option>
-          </select>
-        </label>
-
-        <button className="rounded-lg bg-slate-100 px-5 py-3 text-sm font-bold text-slate-950" type="submit">
-          Start match
-        </button>
+        <Button type="submit">Start match</Button>
       </form>
-    </section>
+    </Panel>
   );
 }
 
