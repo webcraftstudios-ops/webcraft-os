@@ -25,6 +25,25 @@ Zwakke signalen:
 - vrienden die zeggen dat het goed klinkt;
 - verkeer zonder actie.
 
+## Spike03 — Classic Parts Finder Intakeflow & Case View
+
+- Datum: Juli 2026
+- Doel: Aantonen dat we via no-code tools (Tally en Google Sheets) een betrouwbare meervoudige intakeflow kunnen afhandelen voor de 'Classic Parts Finder', die alle benodigde componenten verbindt tot één `case_view`.
+- Opzet: Contactformulier → Autoformulier → Onderdeelformulier → Toestemmingsformulier. Google Sheets aggregeert data op basis van `flow_id`.
+- Testflow bewijs (E2E testcases `012` t/m `014`):
+  - `4aLgZgO`: Incompleet. Alleen contact aanwezig. `case_complete=no`, `status=needs_info`.
+  - `RWR7prp`: Compleet. Alle vier de formulieren ingevuld. `case_complete=yes`, `status=ready_for_source_check`.
+  - `7Xo88NP`: Compleet. Alle vier de formulieren ingevuld. `case_complete=yes`, `status=ready_for_source_check`.
+
+### Interpretatie
+- **Wat werkte?** Het Tally redirect mechanisme dat de hidden parameters doorgeeft aan elk volgend formulier werkt uitstekend. De Sheets JOIN/formules bepalen correct de finale status van de aanvraag.
+- **Wat was de initiële blokker?** Het eerste formulier bevatte geen unieke parameter van buitenaf. De fix was het injecteren van Tally's `Submission ID` in de redirect URL als de initiële `flow_id` voor de volgende stappen.
+- **Is dit voldoende bewijs?** Ja, technisch is de Spike geslaagd. De data-opslag is solide genoeg om naar de volgende testfase over te gaan.
+
+### Volgende actie
+- Gaan we door? Ja, besluit: `go_source_check` (Richting Spike04).
+- Doel Spike04: Handmatige validatie (Manual Source Check) uitvoeren op echte intake-data om te bepalen of het sourcing-proces haalbaar is, zonder inzet van software voor "automatische matching" en zonder focus op betalingslogica.
+
 ## Experiment 001 — Agency Quick-Start Automation Pack
 
 - Datum: nog in te vullen
