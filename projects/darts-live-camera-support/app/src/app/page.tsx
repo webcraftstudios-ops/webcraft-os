@@ -3,19 +3,26 @@
 import { useState } from 'react';
 import { CorrectionControls } from '@/components/CorrectionControls';
 import { MatchSetup, type MatchSetupData } from '@/components/MatchSetup';
-import { MockImagePanel } from '@/components/MockImagePanel';
+import { CameraPanel } from '@/components/CameraPanel';
 import { ScoreInput } from '@/components/ScoreInput';
 import { Scoreboard } from '@/components/Scoreboard';
 import { TurnHistory } from '@/components/TurnHistory';
 import { Card } from '@/components/ui/Card';
 import { SectionLabel } from '@/components/ui/SectionLabel';
-import type { MatchState } from '@/domain/types';
+import type { MatchState, Snapshot } from '@/domain/types';
 
 export default function HomePage() {
   const [matchState, setMatchState] = useState<MatchState | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  
+  // These represent the locally taken snapshot waiting to be attached to the next score
   const [pendingSnapshotId, setPendingSnapshotId] = useState<string | null>(null);
-  const lastSnapshotId = matchState?.turns.at(-1)?.snapshotId ?? null;
+  const [pendingSnapshotUrl, setPendingSnapshotUrl] = useState<string | null>(null);
+  
+  // Find the URL of the last confirmed turn to display in the CameraPanel
+  const lastTurn = matchState?.turns.at(-1);
+  const lastSnapshotId = lastTurn?.snapshotId ?? null;
+  const lastSnapshotUrl = lastSnapshotId ? matchState?.snapshots.find(s => s.id === lastSnapshotId)?.url : null;
 
   function handleStartMatch(data: MatchSetupData) {
     const initialState: MatchState = {
@@ -43,15 +50,45 @@ export default function HomePage() {
     setMatchState(initialState);
     setMessage(null);
     setPendingSnapshotId(null);
+    setPendingSnapshotUrl(null);
   }
 
-  function handleCreateMockImage() {
-    setPendingSnapshotId(`mock-${crypto.randomUUID().slice(0, 8)}`);
-    setMessage('Mock image prepared for the next confirmed score.');
+  function handleCaptureSnapshot(base64Url: string) {
+    setPendingSnapshotId(`snap-${crypto.randomUUID().slice(0, 8)}`);
+    setPendingSnapshotUrl(base64Url);
+    setMessage('Camera image captured for the next confirmed score.');
+  }
+
+  function handleDiscardSnapshot() {
+    setPendingSnapshotId(null);
+    setPendingSnapshotUrl(null);
+  }
+
+  function handleStateChange(newState: MatchState) {
+    // If a new turn was added and we had a pending snapshot, save the snapshot into state
+    if (pendingSnapshotId && pendingSnapshotUrl && newState.turns.length > (matchState?.turns.length ?? 0)) {
+      const newTurn = newState.turns[newState.turns.length - 1];
+      const snapshot: Snapshot = {
+        id: pendingSnapshotId,
+        matchId: newState.match.id,
+        turnId: newTurn.id,
+        url: pendingSnapshotUrl,
+        source: 'camera',
+        createdAt: new Date().toISOString(),
+      };
+      
+      setMatchState({
+        ...newState,
+        snapshots: [...newState.snapshots, snapshot],
+      });
+    } else {
+      setMatchState(newState);
+    }
   }
 
   function handleTurnConfirmed() {
     setPendingSnapshotId(null);
+    setPendingSnapshotUrl(null);
   }
 
   return (
@@ -65,7 +102,7 @@ export default function HomePage() {
                 Scoreboard Prototype
               </h1>
               <p className="mt-4 text-lg text-[var(--dl-muted)]">
-                Start a 301 or 501 demo match. Camera and image recognition stay out of scope for this prototype.
+                Start a 301 or 501 demo match. Real browser camera capture is active. Image recognition stays out of scope for this prototype.
               </p>
             </Card>
             <MatchSetup onStartMatch={handleStartMatch} />
@@ -85,7 +122,7 @@ export default function HomePage() {
                 <ScoreInput
                   state={matchState}
                   pendingSnapshotId={pendingSnapshotId}
-                  onStateChange={setMatchState}
+                  onStateChange={handleStateChange}
                   onMessageChange={setMessage}
                   onTurnConfirmed={handleTurnConfirmed}
                 />
@@ -97,11 +134,11 @@ export default function HomePage() {
               </div>
 
               <div className="grid gap-5">
-                <MockImagePanel
-                  pendingSnapshotId={pendingSnapshotId}
-                  lastSnapshotId={lastSnapshotId}
-                  onCreateSnapshot={handleCreateMockImage}
-                  onClearSnapshot={() => setPendingSnapshotId(null)}
+                <CameraPanel
+                  pendingSnapshotUrl={pendingSnapshotUrl}
+                  lastSnapshotUrl={lastSnapshotUrl}
+                  onCreateSnapshot={handleCaptureSnapshot}
+                  onClearSnapshot={handleDiscardSnapshot}
                 />
                 <TurnHistory state={matchState} />
               </div>
