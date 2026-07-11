@@ -5,6 +5,7 @@ import { SectionLabel } from '@/components/ui/SectionLabel';
 import { StatBadge } from '@/components/ui/StatBadge';
 import { Button } from '@/components/ui/Button';
 import { useFullscreen } from '@/hooks/useFullscreen';
+import { WinnerOverlay } from '@/components/WinnerOverlay';
 
 export type ScoreboardProps = {
   state: MatchState;
@@ -54,24 +55,29 @@ export function Scoreboard({ state }: ScoreboardProps) {
 
           return (
             <article
-              className={`relative flex min-h-[300px] min-w-0 flex-col justify-between overflow-hidden border-[var(--dl-border)] p-6 transition-all duration-200 lg:row-start-1 lg:min-h-[400px] xl:min-h-[500px] lg:p-8 ${columnClassName} ${
-                isCurrentPlayer
-                  ? 'bg-[var(--dl-text)] text-[var(--dl-bg)] ring-4 ring-[var(--dl-primary)] z-10'
-                  : 'bg-[var(--dl-surface-strong)] text-[var(--dl-text)]'
-              } ${isWinner ? 'ring-4 ring-[var(--dl-gold)] z-10' : ''}`}
+              className={`relative flex min-h-[300px] min-w-0 flex-col justify-between overflow-hidden border-[var(--dl-border)] p-6 transition-all duration-500 lg:row-start-1 lg:min-h-[400px] xl:min-h-[500px] lg:p-8 ${columnClassName} ${
+                isCurrentPlayer && !isWinner
+                  ? 'bg-gradient-to-b from-[var(--dl-primary-glow)] to-transparent text-[var(--dl-text)] ring-2 ring-[var(--dl-primary)] shadow-[0_0_40px_var(--dl-primary-glow)] z-10 scale-[1.02]'
+                  : 'bg-[var(--dl-surface-strong)] text-[var(--dl-muted)] opacity-80 scale-100'
+              } ${isWinner ? 'bg-gradient-to-b from-[var(--dl-gold-glow)] to-transparent ring-4 ring-[var(--dl-gold)] shadow-[0_0_60px_var(--dl-gold-glow)] z-20 scale-[1.05] opacity-100' : ''}`}
               key={player.id}
             >
-              <div className="absolute inset-x-0 top-0 h-1 bg-[var(--dl-primary)] opacity-80" />
-              <div>
-                <p className={`text-sm font-black uppercase tracking-[0.25em] ${isCurrentPlayer ? 'text-zinc-700' : 'text-[var(--dl-muted)]'}`}>
+              {isCurrentPlayer && !isWinner && (
+                <div className="absolute inset-x-0 top-0 h-1.5 bg-[var(--dl-primary)] shadow-[0_0_20px_var(--dl-primary)] animate-pulse" />
+              )}
+              {isWinner && (
+                <div className="absolute inset-x-0 top-0 h-2 bg-[var(--dl-gold)] shadow-[0_0_30px_var(--dl-gold)]" />
+              )}
+              <div className="relative z-10">
+                <p className={`text-sm font-black uppercase tracking-[0.25em] transition-colors duration-300 ${isWinner ? 'text-[var(--dl-gold)]' : isCurrentPlayer ? 'text-[var(--dl-primary)]' : 'text-[var(--dl-muted)]'}`}>
                   {isWinner ? 'Winner' : isCurrentPlayer ? 'Throwing' : 'Waiting'}
                 </p>
-                <h3 className="mt-4 truncate text-4xl font-black uppercase tracking-tight md:text-5xl xl:text-6xl">
+                <h3 className={`mt-4 truncate text-4xl font-black uppercase tracking-tight md:text-5xl xl:text-6xl transition-colors duration-300 ${isCurrentPlayer || isWinner ? 'text-[var(--dl-text)]' : 'text-[var(--dl-muted)]'}`}>
                   {player.name}
                 </h3>
               </div>
 
-              <BigNumber className="mt-6 tracking-tighter" size="lg" value={score?.remainingScore ?? state.match.startingScore} />
+              <BigNumber className="relative z-10 mt-6 tracking-tighter" size="lg" value={score?.remainingScore ?? state.match.startingScore} />
             </article>
           );
         })}
@@ -102,6 +108,13 @@ export function Scoreboard({ state }: ScoreboardProps) {
       <footer className="border-t border-[var(--dl-border)] bg-[var(--dl-surface-strong)] px-6 py-4 text-center text-xs font-black uppercase tracking-[0.2em] text-[var(--dl-muted)] sm:text-sm">
         Scoreboard prototype • Human-confirmed scoring • Camera-assisted later
       </footer>
+
+      {winner && (
+        <WinnerOverlay 
+          winnerName={winner.name} 
+          onReset={() => window.location.reload()} 
+        />
+      )}
     </Card>
   );
 }
