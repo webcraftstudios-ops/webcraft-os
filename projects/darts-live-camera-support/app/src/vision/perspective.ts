@@ -1,3 +1,4 @@
+import { getCv } from '@/vision/opencv';
 import type { CalibrationData, Point } from '@/domain/types';
 
 /**
@@ -8,66 +9,7 @@ export const WARPED_SIZE = 800;
 export const WARPED_CENTER: Point = { x: WARPED_SIZE / 2, y: WARPED_SIZE / 2 };
 export const WARPED_RADIUS = WARPED_SIZE / 2;
 
-// Minimal shape of the OpenCV.js global we rely on. OpenCV.js is loaded
-// client-side via a <Script> tag (see app/layout.tsx) and attaches itself to
-// `window.cv`. We avoid pulling in @techstark/opencv-js types to keep this
-// dependency-free; only the handful of APIs we actually use are declared.
-type CVMat = {
-  delete: () => void;
-};
-
-type CVPointLike = number;
-
-type CVStatic = {
-  matFromArray: (rows: number, cols: number, type: number, array: CVPointLike[]) => CVMat;
-  getPerspectiveTransform: (src: CVMat, dst: CVMat) => CVMat;
-  imread: (canvasOrImg: HTMLCanvasElement | HTMLImageElement | string) => CVMat;
-  warpPerspective: (
-    src: CVMat,
-    dst: CVMat,
-    m: CVMat,
-    dsize: { width: number; height: number },
-    flags: number,
-    borderMode: number,
-    borderValue: unknown,
-  ) => void;
-  imshow: (canvasIdOrElement: HTMLCanvasElement | string, mat: CVMat) => void;
-  Mat: new () => CVMat;
-  Size: new (width: number, height: number) => { width: number; height: number };
-  Scalar: new () => unknown;
-  CV_32FC2: number;
-  INTER_LINEAR: number;
-  BORDER_CONSTANT: number;
-};
-
-declare global {
-  interface Window {
-    cv?: CVStatic;
-  }
-}
-
-export class OpenCvNotReadyError extends Error {
-  constructor() {
-    super('OpenCV.js is not loaded yet. Ensure window.cv is initialized before calling vision utilities.');
-    this.name = 'OpenCvNotReadyError';
-  }
-}
-
-function getCv(): CVStatic {
-  if (typeof window === 'undefined' || !window.cv) {
-    throw new OpenCvNotReadyError();
-  }
-  return window.cv;
-}
-
-/**
- * Checks whether OpenCV.js has finished loading and initializing in the browser.
- * Use this before invoking any other vision utility to fail gracefully instead
- * of throwing, per the "never block manual score entry" requirement.
- */
-export function isOpenCvReady(): boolean {
-  return typeof window !== 'undefined' && typeof window.cv !== 'undefined';
-}
+export { isOpenCvReady, OpenCvNotReadyError } from '@/vision/opencv';
 
 /**
  * Builds the destination points (a perfect square aligned to the outer double
