@@ -162,6 +162,18 @@ Proposed sequence:
 
 The camera feasibility spike begins only after the scoreboard workflow has demonstrated real user value.
 
+## Sprint status table
+
+| Sprint | Status | GitHub reference | Branch | Primary output | Next gate |
+| --- | --- | --- | --- | --- | --- |
+| Phase 0 — Definition | Completed | — | — | Commercial framing, MVP, non-goals | Superseded by Phase 1 |
+| Phase 1 — Scoreboard prototype | Completed | — | — | Core 301/501 scoring flow | Superseded by 2.2.2.1 |
+| 2.2.2.1 — Design foundation | Completed & merged | Issue #23, PR #24 | `feature/darts-design-foundation` (deleted) | Design tokens, UI primitives, corrected grid | Merged into `project/darts-live-camera-support` |
+| 2.2.2.2 — Responsive TV layout & kiosk mode | Active | Issue #25 | `feature/darts-responsive-kiosk` | Responsive/kiosk scoreboard | Regression QA → draft PR → user merge approval |
+| 2.2.2.3 — Motion & live-state feedback | Planned | Parent #22 | Not yet created | Restrained transition feedback | Start after 2.2.2.2 merged |
+| 2.2.2.4 — Finish overlay & winner presentation | Planned | Parent #22 | Not yet created | Winner presentation state | Start after 2.2.2.3 merged |
+| 2.2.2.5 — Premium demo QA & accessibility | Planned | Parent #22 | Not yet created | Cross-viewport regression, accessibility | Closes parent issue #22 after acceptance |
+
 ## Standard execution flow
 
 Each implementation sprint uses this sequential gate:
