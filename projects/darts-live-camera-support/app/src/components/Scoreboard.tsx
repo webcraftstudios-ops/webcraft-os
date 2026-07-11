@@ -14,7 +14,7 @@ export function Scoreboard({ state }: ScoreboardProps) {
   const currentPlayer = state.players.find((player) => player.id === state.match.currentPlayerId);
   const winner = state.players.find((player) => player.id === state.match.winnerPlayerId);
   const lastTurn = state.turns.at(-1);
-  const { isFullscreen, toggleFullscreen } = useFullscreen();
+  const { isFullscreen, isSupported, fallbackMessage, toggleFullscreen } = useFullscreen();
 
   return (
     <Card className="overflow-hidden" tone="card">
@@ -25,11 +25,23 @@ export function Scoreboard({ state }: ScoreboardProps) {
             {state.match.gameType} Live Scoreboard
           </h2>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <StatBadge>{state.match.status}</StatBadge>
-          <Button onClick={toggleFullscreen} type="button" variant="secondary" className="px-4 py-2 text-sm">
-            {isFullscreen ? 'Exit Kiosk' : 'Kiosk Mode'}
-          </Button>
+        <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <StatBadge>{state.match.status}</StatBadge>
+            <Button
+              disabled={!isSupported}
+              onClick={toggleFullscreen}
+              title={isSupported ? undefined : 'Kiosk mode is not supported in this browser.'}
+              type="button"
+              variant="secondary"
+              className="px-4 py-2 text-sm"
+            >
+              {isFullscreen ? 'Exit Kiosk' : 'Kiosk Mode'}
+            </Button>
+          </div>
+          {fallbackMessage ? (
+            <p className="max-w-xs text-right text-xs font-semibold text-[var(--dl-muted)]">{fallbackMessage}</p>
+          ) : null}
         </div>
       </header>
 
