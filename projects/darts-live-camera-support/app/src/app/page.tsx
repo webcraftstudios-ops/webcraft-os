@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { CorrectionControls } from '@/components/CorrectionControls';
-import { MatchSetup } from '@/components/MatchSetup';
+import { MatchSetup, type MatchSetupData } from '@/components/MatchSetup';
 import { MockImagePanel } from '@/components/MockImagePanel';
 import { ScoreInput } from '@/components/ScoreInput';
 import { Scoreboard } from '@/components/Scoreboard';
@@ -17,8 +17,29 @@ export default function HomePage() {
   const [pendingSnapshotId, setPendingSnapshotId] = useState<string | null>(null);
   const lastSnapshotId = matchState?.turns.at(-1)?.snapshotId ?? null;
 
-  function handleStartMatch(state: MatchState) {
-    setMatchState(state);
+  function handleStartMatch(data: MatchSetupData) {
+    const initialState: MatchState = {
+      match: {
+        id: crypto.randomUUID(),
+        status: 'active',
+        gameType: data.gameType,
+        startingScore: data.gameType,
+        currentPlayerId: 'p1',
+        createdAt: new Date().toISOString(),
+      },
+      players: [
+        { id: 'p1', name: data.player1, order: 1 },
+        { id: 'p2', name: data.player2, order: 2 },
+      ],
+      playerScores: [
+        { playerId: 'p1', remainingScore: data.gameType },
+        { playerId: 'p2', remainingScore: data.gameType },
+      ],
+      turns: [],
+      corrections: [],
+    };
+
+    setMatchState(initialState);
     setMessage(null);
     setPendingSnapshotId(null);
   }

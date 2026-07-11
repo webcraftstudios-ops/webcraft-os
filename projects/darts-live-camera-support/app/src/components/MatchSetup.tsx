@@ -1,89 +1,103 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-import type { GameType, MatchState } from '@/domain/types';
 import { Button } from '@/components/ui/Button';
 import { Panel } from '@/components/ui/Panel';
-import { SelectField, TextField } from '@/components/ui/Field';
+import { TextField } from '@/components/ui/Field';
+
+export type MatchSetupData = {
+  player1: string;
+  player2: string;
+  gameType: 301 | 501;
+};
 
 export type MatchSetupProps = {
-  onStartMatch: (state: MatchState) => void;
+  onStartMatch: (data: MatchSetupData) => void;
 };
 
 export function MatchSetup({ onStartMatch }: MatchSetupProps) {
-  const [playerOneName, setPlayerOneName] = useState('Player 1');
-  const [playerTwoName, setPlayerTwoName] = useState('Player 2');
-  const [gameType, setGameType] = useState<GameType>('501');
+  const [player1, setPlayer1] = useState('Player 1');
+  const [player2, setPlayer2] = useState('Player 2');
+  const [gameType, setGameType] = useState<301 | 501>(501);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    const playerOne = {
-      id: 'player-1',
-      name: normalizeName(playerOneName, 'Player 1'),
-    };
-
-    const playerTwo = {
-      id: 'player-2',
-      name: normalizeName(playerTwoName, 'Player 2'),
-    };
-
-    const startingScore = gameType === '501' ? 501 : 301;
-    const now = new Date().toISOString();
-
     onStartMatch({
-      match: {
-        id: `match-${crypto.randomUUID()}`,
-        gameType,
-        startingScore,
-        status: 'active',
-        currentPlayerId: playerOne.id,
-        createdAt: now,
-      },
-      players: [playerOne, playerTwo],
-      playerScores: [
-        { playerId: playerOne.id, remainingScore: startingScore },
-        { playerId: playerTwo.id, remainingScore: startingScore },
-      ],
-      turns: [],
-      snapshots: [],
-      corrections: [],
+      player1: player1.trim() || 'Player 1',
+      player2: player2.trim() || 'Player 2',
+      gameType,
     });
   }
 
   return (
-    <Panel description="Two players. 501 default. 301 optional." kicker="Match setup" title="Start a new leg">
-      <form className="grid gap-5" onSubmit={handleSubmit}>
-        <TextField
-          label="Player 1"
-          onChange={(event) => setPlayerOneName(event.target.value)}
-          placeholder="Player 1"
-          value={playerOneName}
-        />
+    <div className="mx-auto mt-12 w-full max-w-xl">
+      <Panel
+        description="Enter player names and select the game type to begin."
+        kicker="Setup"
+        title="Start New Match"
+      >
+        <form className="mt-8 flex flex-col gap-8" onSubmit={handleSubmit}>
+          
+          <div className="grid gap-6 md:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-sm font-semibold uppercase tracking-wider text-[var(--dl-muted)]">
+                Player 1
+              </label>
+              <TextField
+                onChange={(e) => setPlayer1(e.target.value)}
+                placeholder="Name"
+                value={player1}
+                required
+                className="w-full text-lg"
+              />
+            </div>
+            
+            <div>
+              <label className="mb-2 block text-sm font-semibold uppercase tracking-wider text-[var(--dl-muted)]">
+                Player 2
+              </label>
+              <TextField
+                onChange={(e) => setPlayer2(e.target.value)}
+                placeholder="Name"
+                value={player2}
+                required
+                className="w-full text-lg"
+              />
+            </div>
+          </div>
 
-        <TextField
-          label="Player 2"
-          onChange={(event) => setPlayerTwoName(event.target.value)}
-          placeholder="Player 2"
-          value={playerTwoName}
-        />
+          <div>
+            <label className="mb-3 block text-sm font-semibold uppercase tracking-wider text-[var(--dl-muted)]">
+              Game Type
+            </label>
+            <div className="flex gap-4">
+              <Button
+                type="button"
+                variant={gameType === 301 ? 'primary' : 'secondary'}
+                className="flex-1 py-4 text-xl font-bold"
+                onClick={() => setGameType(301)}
+              >
+                301
+              </Button>
+              <Button
+                type="button"
+                variant={gameType === 501 ? 'primary' : 'secondary'}
+                className="flex-1 py-4 text-xl font-bold"
+                onClick={() => setGameType(501)}
+              >
+                501
+              </Button>
+            </div>
+          </div>
 
-        <SelectField
-          label="Starting score"
-          onChange={(event) => setGameType(event.target.value as GameType)}
-          value={gameType}
-        >
-          <option value="501">501</option>
-          <option value="301">301</option>
-        </SelectField>
+          <div className="mt-4 border-t border-[var(--dl-border)] pt-8">
+            <Button type="submit" variant="primary" className="w-full py-5 text-2xl font-black uppercase tracking-widest">
+              Let's Play Darts
+            </Button>
+          </div>
 
-        <Button type="submit">Start match</Button>
-      </form>
-    </Panel>
+        </form>
+      </Panel>
+    </div>
   );
-}
-
-function normalizeName(value: string, fallback: string): string {
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : fallback;
 }
