@@ -9,7 +9,7 @@ import { Scoreboard } from '@/components/Scoreboard';
 import { TurnHistory } from '@/components/TurnHistory';
 import { Card } from '@/components/ui/Card';
 import { SectionLabel } from '@/components/ui/SectionLabel';
-import type { MatchState, Snapshot } from '@/domain/types';
+import type { MatchState, Snapshot, SnapshotSource } from '@/domain/types';
 
 export default function HomePage() {
   const [matchState, setMatchState] = useState<MatchState | null>(null);
@@ -18,6 +18,7 @@ export default function HomePage() {
   // These represent the locally taken snapshot waiting to be attached to the next score
   const [pendingSnapshotId, setPendingSnapshotId] = useState<string | null>(null);
   const [pendingSnapshotUrl, setPendingSnapshotUrl] = useState<string | null>(null);
+  const [pendingSnapshotSource, setPendingSnapshotSource] = useState<SnapshotSource>('camera');
   
   // Find the URL of the last confirmed turn to display in the CameraPanel
   const lastTurn = matchState?.turns.at(-1);
@@ -51,17 +52,24 @@ export default function HomePage() {
     setMessage(null);
     setPendingSnapshotId(null);
     setPendingSnapshotUrl(null);
+    setPendingSnapshotSource('camera');
   }
 
-  function handleCaptureSnapshot(base64Url: string) {
+  function handleCaptureSnapshot(base64Url: string, source: SnapshotSource = 'camera') {
     setPendingSnapshotId(`snap-${crypto.randomUUID().slice(0, 8)}`);
     setPendingSnapshotUrl(base64Url);
-    setMessage('Camera image captured for the next confirmed score.');
+    setPendingSnapshotSource(source);
+    setMessage(
+      source === 'rtsp'
+        ? 'IP camera image captured for the next confirmed score.'
+        : 'Camera image captured for the next confirmed score.'
+    );
   }
 
   function handleDiscardSnapshot() {
     setPendingSnapshotId(null);
     setPendingSnapshotUrl(null);
+    setPendingSnapshotSource('camera');
   }
 
   function handleStateChange(newState: MatchState) {
@@ -73,7 +81,7 @@ export default function HomePage() {
         matchId: newState.match.id,
         turnId: newTurn.id,
         url: pendingSnapshotUrl,
-        source: 'camera',
+        source: pendingSnapshotSource,
         createdAt: new Date().toISOString(),
       };
       
@@ -89,6 +97,7 @@ export default function HomePage() {
   function handleTurnConfirmed() {
     setPendingSnapshotId(null);
     setPendingSnapshotUrl(null);
+    setPendingSnapshotSource('camera');
   }
 
   return (
