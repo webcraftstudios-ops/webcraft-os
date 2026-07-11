@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { CameraPreview, type CameraPreviewRef } from '@/components/CameraPreview';
+import { isOpenCvReady, warpBoardImage } from '@/vision/perspective';
 import type { CalibrationData, Point } from '@/domain/types';
 
 type CalibrationSetupProps = {
@@ -13,10 +14,49 @@ type CalibrationSetupProps = {
 export function CalibrationSetup({ onComplete, onCancel }: CalibrationSetupProps) {
   const cameraRef = useRef<CameraPreviewRef>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   
   const [step, setStep] = useState<1 | 2>(1);
   const [baselineUrl, setBaselineUrl] = useState<string | null>(null);
   const [points, setPoints] = useState<Point[]>([]);
+  const [warpError, setWarpError] = useState<string | null>(null);
+  const [cvReady, setCvReady] = useState(false);
+
+  // Poll for OpenCV readiness since the script loads lazily and asynchronously.
+  useEffect(() => {
+    if (cvReady) return;
+    const interval = setInterval(() => {
+      if (isOpenCvReady()) {
+        setCvReady(true);
+        clearInterval(interval);
+      }
+    }, 300);
+    return () => clearInterval(interval);
+  }, [cvReady]);
+
+  // Re-run the warp preview automatically whenever we have all 4 points.
+  useEffect(() => {
+    if (points.length !== 4) return;
+    if (!cvReady) {
+      setWarpError('OpenCV is still loading. The preview will appear automatically once ready.');
+      return;
+    }
+
+    const sourceCanvas = canvasRef.current;
+    const previewCanvas = previewCanvasRef.current;
+    if (!sourceCanvas || !previewCanvas) return;
+
+    try {
+      warpBoardImage(sourceCanvas, previewCanvas, {
+        baselineUrl: baselineUrl ?? '',
+        sourcePoints: points as [Point, Point, Point, Point],
+      });
+      setWarpError(null);
+    } catch (err) {
+      setWarpError(err instanceof Error ? err.message : 'Failed to warp the board preview.');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [points, cvReady]);
 
   function handleCaptureBaseline() {
     if (cameraRef.current) {
@@ -97,7 +137,13 @@ export function CalibrationSetup({ onComplete, onCancel }: CalibrationSetupProps
 
   function handleReset() {
     setPoints([]);
+    setWarpError(null);
     if (baselineUrl) drawImageToCanvas(baselineUrl);
+    const previewCanvas = previewCanvasRef.current;
+    if (previewCanvas) {
+      const ctx = previewCanvas.getContext('2d');
+      ctx?.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+    }
   }
 
   function handleFinish() {
@@ -151,12 +197,38 @@ export function CalibrationSetup({ onComplete, onCancel }: CalibrationSetupProps
             <span className={points.length === 3 ? 'text-[var(--dl-primary)] font-bold' : ''}>4. Left (D11)</span>
           </p>
           
-          <div className="relative mx-auto w-full overflow-hidden rounded-xl border border-[var(--dl-border)] bg-black shadow-inner">
-            <canvas 
-              ref={canvasRef} 
-              onClick={handleCanvasClick}
-              className="w-full h-auto cursor-crosshair block" 
-            />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--dl-muted)]">
+                Source (Click here)
+              </span>
+              <div className="relative overflow-hidden rounded-xl border border-[var(--dl-border)] bg-black shadow-inner">
+                <canvas
+                  ref={canvasRef}
+                  onClick={handleCanvasClick}
+                  className="block h-auto w-full cursor-crosshair"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--dl-muted)]">
+                Warped Preview (Perspective Corrected)
+              </span>
+              <div className="relative flex items-center justify-center overflow-hidden rounded-xl border border-[var(--dl-border)] bg-black shadow-inner aspect-square">
+                {points.length < 4 ? (
+                  <p className="p-4 text-center text-sm text-[var(--dl-muted)]">
+                    Click all 4 points on the left to see the corrected, perfectly circular board here.
+                  </p>
+                ) : warpError ? (
+                  <p className="p-4 text-center text-sm text-amber-400">{warpError}</p>
+                ) : null}
+                <canvas
+                  ref={previewCanvasRef}
+                  className={`absolute inset-0 h-full w-full object-contain ${points.length === 4 && !warpError ? '' : 'hidden'}`}
+                />
+              </div>
+            </div>
           </div>
 
           <div className="flex gap-4 mt-2">
