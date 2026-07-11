@@ -1,5 +1,15 @@
 export type GameType = '301' | '501';
 
+export type Point = {
+  x: number;
+  y: number;
+};
+
+export type CalibrationData = {
+  baselineUrl: string; // The base64 empty board image
+  sourcePoints: [Point, Point, Point, Point]; // The 4 corners clicked (Top, Right, Bottom, Left)
+};
+
 export type MatchStatus = 'setup' | 'active' | 'finished';
 
 export type SnapshotSource = 'mock' | 'upload' | 'camera';

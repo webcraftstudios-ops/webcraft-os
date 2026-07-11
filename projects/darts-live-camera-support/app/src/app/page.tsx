@@ -3,16 +3,19 @@
 import { useState } from 'react';
 import { CorrectionControls } from '@/components/CorrectionControls';
 import { MatchSetup, type MatchSetupData } from '@/components/MatchSetup';
+import { CalibrationSetup } from '@/components/CalibrationSetup';
 import { CameraPanel } from '@/components/CameraPanel';
 import { ScoreInput } from '@/components/ScoreInput';
 import { Scoreboard } from '@/components/Scoreboard';
 import { TurnHistory } from '@/components/TurnHistory';
 import { Card } from '@/components/ui/Card';
 import { SectionLabel } from '@/components/ui/SectionLabel';
-import type { MatchState, Snapshot } from '@/domain/types';
+import type { MatchState, Snapshot, CalibrationData } from '@/domain/types';
 
 export default function HomePage() {
   const [matchState, setMatchState] = useState<MatchState | null>(null);
+  const [calibrationData, setCalibrationData] = useState<CalibrationData | null>(null);
+  const [isCalibrating, setIsCalibrating] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   
   // These represent the locally taken snapshot waiting to be attached to the next score
@@ -95,18 +98,41 @@ export default function HomePage() {
     <main className="min-h-screen px-4 py-6 text-[var(--dl-text)] md:px-8">
       <section className="mx-auto flex max-w-7xl flex-col gap-6">
         {!matchState ? (
-          <div className="mx-auto w-full max-w-3xl pt-10">
-            <Card className="mb-6 p-8" tone="card">
-              <SectionLabel>Darts Live Camera Support</SectionLabel>
-              <h1 className="mt-4 text-5xl font-black uppercase tracking-tight text-[var(--dl-text)]">
-                Scoreboard Prototype
-              </h1>
-              <p className="mt-4 text-lg text-[var(--dl-muted)]">
-                Start a 301 or 501 demo match. Real browser camera capture is active. Image recognition stays out of scope for this prototype.
-              </p>
-            </Card>
-            <MatchSetup onStartMatch={handleStartMatch} />
-          </div>
+          isCalibrating ? (
+            <div className="mx-auto w-full max-w-3xl pt-10">
+              <CalibrationSetup 
+                onComplete={(data) => {
+                  setCalibrationData(data);
+                  setIsCalibrating(false);
+                }} 
+                onCancel={() => setIsCalibrating(false)} 
+              />
+            </div>
+          ) : (
+            <div className="mx-auto w-full max-w-3xl pt-10">
+              <Card className="mb-6 p-8" tone="card">
+                <SectionLabel>Darts Live Camera Support</SectionLabel>
+                <div className="flex justify-between items-start">
+                  <h1 className="mt-4 text-5xl font-black uppercase tracking-tight text-[var(--dl-text)]">
+                    Scoreboard Prototype
+                  </h1>
+                  <button 
+                    onClick={() => setIsCalibrating(true)}
+                    className="mt-4 rounded bg-[var(--dl-panel)] px-4 py-2 text-sm font-bold uppercase tracking-wider text-[var(--dl-primary)] transition-colors hover:brightness-110"
+                  >
+                    {calibrationData ? 'Recalibrate Camera' : 'Calibrate Camera'}
+                  </button>
+                </div>
+                <p className="mt-4 text-lg text-[var(--dl-muted)]">
+                  Start a 301 or 501 demo match. Real browser camera capture is active. 
+                  {calibrationData 
+                    ? ' OpenCV Calibration is configured.' 
+                    : ' Calibrate the camera first for OpenCV dart detection.'}
+                </p>
+              </Card>
+              <MatchSetup onStartMatch={handleStartMatch} />
+            </div>
+          )
         ) : (
           <>
             {message ? (
