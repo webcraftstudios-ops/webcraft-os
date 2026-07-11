@@ -40,10 +40,11 @@ export function MatchSetup({ onStartMatch }: MatchSetupProps) {
           
           <div className="grid gap-6 md:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-semibold uppercase tracking-wider text-[var(--dl-muted)]">
+              <label htmlFor="player1-input" className="mb-2 block text-sm font-semibold uppercase tracking-wider text-[var(--dl-muted)]">
                 Player 1
               </label>
               <TextField
+                id="player1-input"
                 onChange={(e) => setPlayer1(e.target.value)}
                 placeholder="Name"
                 value={player1}
@@ -53,10 +54,11 @@ export function MatchSetup({ onStartMatch }: MatchSetupProps) {
             </div>
             
             <div>
-              <label className="mb-2 block text-sm font-semibold uppercase tracking-wider text-[var(--dl-muted)]">
+              <label htmlFor="player2-input" className="mb-2 block text-sm font-semibold uppercase tracking-wider text-[var(--dl-muted)]">
                 Player 2
               </label>
               <TextField
+                id="player2-input"
                 onChange={(e) => setPlayer2(e.target.value)}
                 placeholder="Name"
                 value={player2}

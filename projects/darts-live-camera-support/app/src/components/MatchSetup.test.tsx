@@ -8,8 +8,8 @@ describe('MatchSetup component', () => {
     render(<MatchSetup onStartMatch={handleStartMatch} />);
 
     // Check of de input velden bestaan en de default values hebben
-    expect(screen.getByDisplayValue('Player 1')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Player 2')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /Player 1/i })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /Player 2/i })).toBeInTheDocument();
 
     // 501 knop zou 'primary' variant class moeten hebben (die in onze UI een bepaalde styling heeft)
     // Omdat we geen toegang hebben tot de werkelijke CSS styles in jsdom testen we hier de actieve staat
@@ -29,8 +29,8 @@ describe('MatchSetup component', () => {
     render(<MatchSetup onStartMatch={handleStartMatch} />);
 
     // Pas velden aan
-    const p1Input = screen.getByDisplayValue('Player 1');
-    const p2Input = screen.getByDisplayValue('Player 2');
+    const p1Input = screen.getByRole('textbox', { name: /Player 1/i });
+    const p2Input = screen.getByRole('textbox', { name: /Player 2/i });
     
     fireEvent.change(p1Input, { target: { value: 'Michael van Gerwen' } });
     fireEvent.change(p2Input, { target: { value: 'Luke Littler' } });
@@ -54,7 +54,7 @@ describe('MatchSetup component', () => {
     render(<MatchSetup onStartMatch={handleStartMatch} />);
 
     // Maak velden leeg door alleen spaties in te voeren
-    const p1Input = screen.getByDisplayValue('Player 1');
+    const p1Input = screen.getByRole('textbox', { name: /Player 1/i });
     fireEvent.change(p1Input, { target: { value: '    ' } });
 
     // Bij HTML-5 "required" zal de form-submit eventueel al falen in de browser, 
@@ -72,8 +72,8 @@ describe('MatchSetup component', () => {
     const handleStartMatch = vi.fn();
     render(<MatchSetup onStartMatch={handleStartMatch} />);
 
-    const p1Input = screen.getByDisplayValue('Player 1');
-    const p2Input = screen.getByDisplayValue('Player 2');
+    const p1Input = screen.getByRole('textbox', { name: /Player 1/i });
+    const p2Input = screen.getByRole('textbox', { name: /Player 2/i });
 
     // Extreem lange naam en vreemde karakters
     const longName = 'A'.repeat(100);
@@ -95,7 +95,7 @@ describe('MatchSetup component', () => {
     const handleStartMatch = vi.fn();
     render(<MatchSetup onStartMatch={handleStartMatch} />);
 
-    const p1Input = screen.getByDisplayValue('Player 1');
+    const p1Input = screen.getByRole('textbox', { name: /Player 1/i });
     fireEvent.change(p1Input, { target: { value: 'Phil Taylor' } });
 
     const btn301 = screen.getByRole('button', { name: '301' });
@@ -120,7 +120,7 @@ describe('MatchSetup component', () => {
     const handleStartMatch = vi.fn();
     render(<MatchSetup onStartMatch={handleStartMatch} />);
 
-    const p1Input = screen.getByDisplayValue('Player 1');
+    const p1Input = screen.getByRole('textbox', { name: /Player 1/i });
     
     // Verander de naam en druk dan op Enter (wat onKeyDown simuleert of submit triggert in forms)
     fireEvent.change(p1Input, { target: { value: 'Gary Anderson' } });
