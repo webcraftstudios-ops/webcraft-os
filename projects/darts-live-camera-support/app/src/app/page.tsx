@@ -22,14 +22,14 @@ export default function HomePage() {
       match: {
         id: crypto.randomUUID(),
         status: 'active',
-        gameType: data.gameType,
+        gameType: String(data.gameType) as '301' | '501',
         startingScore: data.gameType,
         currentPlayerId: 'p1',
         createdAt: new Date().toISOString(),
       },
       players: [
-        { id: 'p1', name: data.player1, order: 1 },
-        { id: 'p2', name: data.player2, order: 2 },
+        { id: 'p1', name: data.player1 },
+        { id: 'p2', name: data.player2 },
       ],
       playerScores: [
         { playerId: 'p1', remainingScore: data.gameType },
@@ -37,6 +37,7 @@ export default function HomePage() {
       ],
       turns: [],
       corrections: [],
+      snapshots: [],
     };
 
     setMatchState(initialState);
