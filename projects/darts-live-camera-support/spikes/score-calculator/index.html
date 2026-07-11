@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Darts Score Calculator (OpenCV Perspective Warp)</title>
+  <!-- Load OpenCV.js asynchronously -->
+  <script src="https://docs.opencv.org/4.8.0/opencv.js" type="text/javascript"></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f0f0f0;
+      color: #333;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .panel {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .controls {
+      flex: 1;
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .canvas-container {
+      flex: 2;
+      min-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .canvas-wrapper {
+      position: relative;
+      border: 1px solid #ccc;
+      background: #fff;
+    }
+    .canvas-wrapper h3 {
+      position: absolute;
+      top: -10px;
+      left: 10px;
+      background: white;
+      padding: 0 10px;
+      margin: 0;
+      font-size: 14px;
+      color: #666;
+    }
+    canvas {
+      max-width: 100%;
+      cursor: crosshair;
+      display: block;
+    }
+    .step {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: #fafafa;
+    }
+    .step.active {
+      background: #e3f2fd;
+      border-color: #2196f3;
+    }
+    .step.done {
+      background: #e8f5e9;
+      color: #388e3c;
+    }
+    button {
+      padding: 8px 16px;
+      background: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1976d2;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    .file-upload-btn {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #4caf50;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .file-upload-btn:hover {
+      background: #388e3c;
+    }
+    #result-log {
+      height: 200px;
+      overflow-y: auto;
+      background: #222;
+      color: #0f0;
+      padding: 10px;
+      font-family: monospace;
+      border-radius: 4px;
+    }
+    .instruction-text {
+      font-size: 14px;
+      color: #666;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>OpenCV Perspective Transform (Spike 4.1)</h1>
+  <p>Verhelpt de ellips-vervorming (schuine camera) door 4 uiterste randen van het bord aan te klikken. Dit "strijkt" het bord virtueel plat, waarna de score wiskunde perfect werkt.</p>
+
+  <div class="container">
+    <div class="controls panel">
+      <h2>Stappen</h2>
+      <div id="cv-status" style="color: orange; font-weight: bold; margin-bottom: 10px;">OpenCV is loading...</div>
+      
+      <div id="step-1" class="step active">
+        <strong>Stap 1: Foto laden</strong><br>
+        <label class="file-upload-btn">
+          <input type="file" id="image-upload" accept="image/*">
+          Kies Afbeelding
+        </label>
+      </div>
+
+      <div id="step-2" class="step">
+        <strong>Stap 2: Buitenste hoeken (4 punten)</strong><br>
+        <p class="instruction-text">Klik op de originele foto (links) de 4 uiterste randen van de <b>Double Ring</b> aan, in deze specifieke volgorde:</p>
+        <ol style="margin: 5px 0; padding-left: 20px; font-size: 14px;">
+          <li id="pt-1">Top (Double 20 rand)</li>
+          <li id="pt-2">Rechts (Double 6 rand)</li>
+          <li id="pt-3">Onder (Double 3 rand)</li>
+          <li id="pt-4">Links (Double 11 rand)</li>
+        </ol>
+      </div>
+
+      <div id="step-3" class="step">
+        <strong>Stap 3: OpenCV Warp & Test Pijlen</strong><br>
+        <p class="instruction-text">De foto is nu platgestreken (rechts). Klik op het rechter canvas om de perfecte cirkel-score te testen.</p>
+        <button id="reset-btn">Reset Kalibratie</button>
+      </div>
+
+      <h3>Score Log</h3>
+      <div id="result-log"></div>
+    </div>
+
+    <div class="canvas-container">
+      <div class="canvas-wrapper panel">
+        <h3>Bronfoto (Vervormd)</h3>
+        <!-- We use an internal resolution of 800x600 for the source processing -->
+        <canvas id="source-canvas" width="800" height="600"></canvas>
+      </div>
+      <div class="canvas-wrapper panel">
+        <h3>OpenCV Output (Gestrekte perfecte cirkel)</h3>
+        <!-- We warp it to a perfect 800x800 square -->
+        <canvas id="warped-canvas" width="800" height="800"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Constants for Scoring ---
+    const SEGMENTS = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
+    const RINGS = {
+      DOUBLE_OUTER: 1.0,           
+      DOUBLE_INNER: 162.0 / 170.0, 
+      TREBLE_OUTER: 107.4 / 170.0,
+      TREBLE_INNER: 99.4 / 170.0,  
+      OUTER_BULL: (31.8 / 2) / 170.0,    
+      INNER_BULL: (12.7 / 2) / 170.0,    
+    };
+
+    // --- State ---
+    let currentState = 1;
+    let currentImage = null;
+    let srcPoints = []; // Will hold the 4 clicked points {x, y}
+    
+    // --- Hardcoded mathematical perfect board constants for the Warped canvas ---
+    // If we warp to an 800x800 square, and we clicked the DOUBLE_OUTER bounds:
+    // The radius will be exactly 400px, and center will be exactly (400, 400).
+    const WARPED_SIZE = 800;
+    const WARPED_CENTER = { x: 400, y: 400 };
+    const WARPED_RADIUS = 400;
+    // We also know exactly where angle 0 is, because Top (D20) is at (400, 0)
+    // Angle offset points to '20' which is UP.
+    const WARPED_ANGLE_OFFSET = -Math.PI / 2; // -90 degrees
+
+    // --- DOM Elements ---
+    const srcCanvas = document.getElementById('source-canvas');
+    const srcCtx = srcCanvas.getContext('2d');
+    const warpedCanvas = document.getElementById('warped-canvas');
+    const warpedCtx = warpedCanvas.getContext('2d');
+    const resultLog = document.getElementById('result-log');
+
+    // Wait for OpenCV to initialize
+    cv['onRuntimeInitialized'] = () => {
+      document.getElementById('cv-status').textContent = 'OpenCV Ready!';
+      document.getElementById('cv-status').style.color = 'green';
+    };
+
+    function log(msg) {
+      const div = document.createElement('div');
+      div.textContent = msg;
+      resultLog.prepend(div);
+    }
+
+    function setStep(step) {
+      document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+      for(let i=1; i<step; i++) {
+        document.getElementById(`step-${i}`).classList.add('done');
+      }
+      document.getElementById(`step-${step}`).classList.add('active');
+      currentState = step;
+    }
+
+    // --- Image Upload ---
+    document.getElementById('image-upload').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          currentImage = img;
+          resetCalibration();
+          drawSourceImage();
+          setStep(2);
+          log('Foto geladen. Klik nu de 4 hoeken op het Linker canvas.');
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function drawSourceImage() {
+      if (!currentImage) return;
+      
+      const scale = Math.min(srcCanvas.width / currentImage.width, srcCanvas.height / currentImage.height);
+      const w = currentImage.width * scale;
+      const h = currentImage.height * scale;
+      const x = (srcCanvas.width - w) / 2;
+      const y = (srcCanvas.height - h) / 2;
+
+      srcCtx.clearRect(0, 0, srcCanvas.width, srcCanvas.height);
+      srcCtx.drawImage(currentImage, x, y, w, h);
+
+      // Draw clicked points
+      srcPoints.forEach((pt, index) => {
+        srcCtx.fillStyle = 'red';
+        srcCtx.beginPath();
+        srcCtx.arc(pt.x, pt.y, 5, 0, Math.PI * 2);
+        srcCtx.fill();
+        srcCtx.fillStyle = 'white';
+        srcCtx.font = '12px Arial';
+        srcCtx.fillText(index + 1, pt.x - 4, pt.y + 4);
+      });
+      
+      // Draw polygon if we have enough points
+      if (srcPoints.length > 1) {
+        srcCtx.strokeStyle = 'cyan';
+        srcCtx.lineWidth = 2;
+        srcCtx.beginPath();
+        srcCtx.moveTo(srcPoints[0].x, srcPoints[0].y);
+        for(let i=1; i<srcPoints.length; i++) {
+          srcCtx.lineTo(srcPoints[i].x, srcPoints[i].y);
+        }
+        if(srcPoints.length === 4) srcCtx.closePath();
+        srcCtx.stroke();
+      }
+    }
+
+    // --- Step 2: Clicking 4 corners on Source Canvas ---
+    srcCanvas.addEventListener('click', (e) => {
+      if (currentState !== 2) return;
+      if (srcPoints.length >= 4) return;
+
+      const rect = srcCanvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) * (srcCanvas.width / rect.width);
+      const y = (e.clientY - rect.top) * (srcCanvas.height / rect.height);
+
+      srcPoints.push({x, y});
+      document.getElementById(`pt-${srcPoints.length}`).style.fontWeight = 'bold';
+      document.getElementById(`pt-${srcPoints.length}`).style.color = 'green';
+      
+      drawSourceImage();
+
+      if (srcPoints.length === 4) {
+        log('4 punten geselecteerd! Voer OpenCV Warp uit...');
+        performOpenCVWarp();
+      }
+    });
+
+    // --- OpenCV Magic ---
+    function performOpenCVWarp() {
+      try {
+        // 1. Convert our 4 source points to OpenCV Matrix
+        let srcTri = cv.matFromArray(4, 1, cv.CV_32FC2, [
+          srcPoints[0].x, srcPoints[0].y, // Top
+          srcPoints[1].x, srcPoints[1].y, // Right
+          srcPoints[2].x, srcPoints[2].y, // Bottom
+          srcPoints[3].x, srcPoints[3].y  // Left
+        ]);
+
+        // 2. Define our perfect 800x800 destination square
+        // We clicked the outer double bounds. 
+        // In an 800x800 square, Center is 400, Radius is 400.
+        // So Top is (400, 0), Right is (800, 400), Bottom is (400, 800), Left is (0, 400)
+        let dstTri = cv.matFromArray(4, 1, cv.CV_32FC2, [
+          WARPED_CENTER.x, 0,                                 // Top
+          WARPED_SIZE, WARPED_CENTER.y,                       // Right
+          WARPED_CENTER.x, WARPED_SIZE,                       // Bottom
+          0, WARPED_CENTER.y                                  // Left
+        ]);
+
+        // 3. Get the perspective transform matrix
+        let M = cv.getPerspectiveTransform(srcTri, dstTri);
+
+        // 4. Read the source canvas into OpenCV
+        let srcMat = cv.imread(srcCanvas);
+        let dstMat = new cv.Mat();
+        let dsize = new cv.Size(WARPED_SIZE, WARPED_SIZE);
+
+        // 5. Apply the warp!
+        cv.warpPerspective(srcMat, dstMat, M, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
+
+        // 6. Show the perfectly circular board on the second canvas
+        cv.imshow('warped-canvas', dstMat);
+        
+        // 7. Cleanup OpenCV memory
+        srcMat.delete(); dstMat.delete(); M.delete(); srcTri.delete(); dstTri.delete();
+
+        // 8. Draw the theoretical grid over the new perfect circle to prove it aligns
+        drawPerfectGrid();
+        
+        setStep(3);
+        log('Warp Succes! Je kunt nu op het rechter canvas perfecte scores testen.');
+
+      } catch (err) {
+        log('OpenCV Error: ' + err);
+        console.error(err);
+      }
+    }
+
+    function drawPerfectGrid() {
+      warpedCtx.strokeStyle = 'rgba(0, 255, 255, 0.5)';
+      warpedCtx.lineWidth = 1;
+
+      const drawRing = (relativeRadius) => {
+        warpedCtx.beginPath();
+        warpedCtx.arc(WARPED_CENTER.x, WARPED_CENTER.y, WARPED_RADIUS * relativeRadius, 0, Math.PI * 2);
+        warpedCtx.stroke();
+      };
+
+      drawRing(RINGS.DOUBLE_OUTER);
+      drawRing(RINGS.DOUBLE_INNER);
+      drawRing(RINGS.TREBLE_OUTER);
+      drawRing(RINGS.TREBLE_INNER);
+      drawRing(RINGS.OUTER_BULL_R);
+      drawRing(RINGS.INNER_BULL_R);
+
+      // Draw segment lines
+      for (let i = 0; i < 20; i++) {
+        const angle = WARPED_ANGLE_OFFSET + (i * 18 + 9) * (Math.PI / 180);
+        warpedCtx.beginPath();
+        warpedCtx.moveTo(WARPED_CENTER.x, WARPED_CENTER.y);
+        warpedCtx.lineTo(
+          WARPED_CENTER.x + Math.cos(angle) * WARPED_RADIUS,
+          WARPED_CENTER.y + Math.sin(angle) * WARPED_RADIUS
+        );
+        warpedCtx.stroke();
+      }
+    }
+
+    // --- Step 3: Clicking on the Warped Canvas ---
+    warpedCanvas.addEventListener('click', (e) => {
+      if (currentState !== 3) return;
+
+      const rect = warpedCanvas.getBoundingClientRect();
+      // Adjust for potential CSS scaling of the canvas element
+      const px = (e.clientX - rect.left) * (warpedCanvas.width / rect.width);
+      const py = (e.clientY - rect.top) * (warpedCanvas.height / rect.height);
+
+      calculateScore(px, py);
+    });
+
+    function calculateScore(px, py) {
+      const dx = px - WARPED_CENTER.x;
+      const dy = py - WARPED_CENTER.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const relativeDist = distance / WARPED_RADIUS;
+      
+      let angle = Math.atan2(dy, dx);
+      let relativeAngle = angle - WARPED_ANGLE_OFFSET;
+      
+      while (relativeAngle < 0) relativeAngle += Math.PI * 2;
+      while (relativeAngle >= Math.PI * 2) relativeAngle -= Math.PI * 2;
+      
+      const angleDeg = relativeAngle * (180 / Math.PI);
+      
+      let adjustedDeg = (angleDeg + 9) % 360;
+      let segmentIndex = Math.floor(adjustedDeg / 18);
+      let segmentValue = SEGMENTS[segmentIndex];
+
+      let multiplier = 1;
+      let scoreType = 'Single';
+      let scoreValue = segmentValue;
+
+      if (relativeDist > RINGS.DOUBLE_OUTER) {
+        scoreType = 'Miss';
+        scoreValue = 0;
+        multiplier = 0;
+      } else if (relativeDist >= RINGS.DOUBLE_INNER) {
+        scoreType = 'Double';
+        multiplier = 2;
+        scoreValue = segmentValue * 2;
+      } else if (relativeDist > RINGS.TREBLE_OUTER) {
+        scoreType = 'Single';
+        multiplier = 1;
+      } else if (relativeDist >= RINGS.TREBLE_INNER) {
+        scoreType = 'Treble';
+        multiplier = 3;
+        scoreValue = segmentValue * 3;
+      } else if (relativeDist > RINGS.OUTER_BULL_R) {
+        scoreType = 'Single';
+        multiplier = 1;
+      } else if (relativeDist >= RINGS.INNER_BULL_R) {
+        scoreType = 'Outer Bull';
+        scoreValue = 25;
+        multiplier = 1;
+      } else {
+        scoreType = 'Inner Bull (Double)';
+        scoreValue = 50;
+        multiplier = 2;
+      }
+
+      // Draw point on warped canvas
+      warpedCtx.fillStyle = 'yellow';
+      warpedCtx.beginPath();
+      warpedCtx.arc(px, py, 6, 0, Math.PI * 2);
+      warpedCtx.fill();
+      warpedCtx.strokeStyle = 'black';
+      warpedCtx.stroke();
+
+      const resultStr = `${scoreType} ${scoreType !== 'Miss' && scoreType !== 'Outer Bull' && scoreType !== 'Inner Bull (Double)' ? segmentValue : ''} => Score: ${scoreValue}`;
+      log(resultStr);
+    }
+
+    function resetCalibration() {
+      srcPoints = [];
+      for(let i=1; i<=4; i++) {
+        document.getElementById(`pt-${i}`).style.fontWeight = 'normal';
+        document.getElementById(`pt-${i}`).style.color = 'inherit';
+      }
+      document.querySelectorAll('.step').forEach(el => el.classList.remove('done'));
+      warpedCtx.clearRect(0, 0, warpedCanvas.width, warpedCanvas.height);
+      resultLog.innerHTML = '';
+      if(currentImage) {
+        setStep(2);
+        drawSourceImage();
+      } else {
+        setStep(1);
+        srcCtx.clearRect(0, 0, srcCanvas.width, srcCanvas.height);
+      }
+    }
+
+    document.getElementById('reset-btn').addEventListener('click', resetCalibration);
+
+  </script>
+</body>
+</html>
