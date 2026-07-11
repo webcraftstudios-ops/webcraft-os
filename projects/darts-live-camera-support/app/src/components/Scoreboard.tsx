@@ -6,6 +6,7 @@ import { StatBadge } from '@/components/ui/StatBadge';
 import { Button } from '@/components/ui/Button';
 import { useFullscreen } from '@/hooks/useFullscreen';
 import { WinnerOverlay } from '@/components/WinnerOverlay';
+import { CameraPreview } from '@/components/CameraPreview';
 
 export type ScoreboardProps = {
   state: MatchState;
@@ -98,9 +99,8 @@ export function Scoreboard({ state }: ScoreboardProps) {
             </p>
           </div>
 
-          <div className="rounded-lg border border-[var(--dl-border)] bg-[var(--dl-surface-strong)] p-4">
-            <SectionLabel>Mode</SectionLabel>
-            <p className="mt-2 text-xl font-black text-[var(--dl-text)]">TV Demo</p>
+          <div className="flex-1 mt-4">
+            <CameraPreview isLive={true} />
           </div>
         </aside>
       </div>
