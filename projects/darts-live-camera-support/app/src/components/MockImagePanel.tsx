@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/Button';
 import { Panel } from '@/components/ui/Panel';
+import { CameraPreview } from '@/components/CameraPreview';
 
 export type MockImagePanelProps = {
   pendingSnapshotId: string | null;
@@ -22,29 +23,25 @@ export function MockImagePanel({
       kicker="Mock image panel"
       title="Assisted scoring image"
     >
-      <div className="rounded-xl border border-dashed border-[var(--dl-border)] bg-[var(--dl-bg)] p-6 text-center">
-        <div className="mx-auto flex h-40 max-w-md items-center justify-center rounded-lg border border-[var(--dl-border)] bg-[var(--dl-surface)]">
-          <div>
-            <p className="text-sm text-[var(--dl-muted)]">Simulated dartboard snapshot</p>
-            <p className="mt-2 text-lg font-semibold text-[var(--dl-text)]">
-              {pendingSnapshotId ?? lastSnapshotId ?? 'No image reference yet'}
-            </p>
-          </div>
-        </div>
+      <div className="h-64 rounded-xl">
+        <CameraPreview 
+          isLive={!pendingSnapshotId && !lastSnapshotId} 
+          snapshotUrl={pendingSnapshotId ? '/images/mock-dartboard-pending.jpg' : lastSnapshotId ? '/images/mock-dartboard-saved.jpg' : undefined} 
+        />
       </div>
 
       <div className="mt-5 flex flex-col gap-3 md:flex-row">
         <Button onClick={onCreateSnapshot} type="button">
-          Create mock image
+          Capture Snapshot
         </Button>
         <Button disabled={!pendingSnapshotId} onClick={onClearSnapshot} type="button" variant="secondary">
-          Clear pending image
+          Discard Image
         </Button>
       </div>
 
-      <div className="mt-4 grid gap-2 text-sm text-[var(--dl-muted)]">
-        <p>Pending image: {pendingSnapshotId ?? '-'}</p>
-        <p>Last linked image: {lastSnapshotId ?? '-'}</p>
+      <div className="mt-4 flex items-center justify-between text-sm text-[var(--dl-muted)]">
+        <p>Pending image: <span className="font-mono text-[var(--dl-text)]">{pendingSnapshotId ?? '-'}</span></p>
+        <p>Last linked image: <span className="font-mono text-[var(--dl-text)]">{lastSnapshotId ?? '-'}</span></p>
       </div>
     </Panel>
   );
