@@ -1,152 +1,178 @@
 # Sprints — Darts Live Camera Support
 
-## Fase 0 — Projectkader omgezet naar sprints
+## Current status
 
-Doel van fase 0: het project scherp genoeg maken om te bouwen zonder te verzanden in een te groot computer-vision R&D-traject.
+The project has completed its commercial framing, MVP definition, technical foundation, core scoreboard prototype, correction/undo flow, mock image support, Codespaces/CI setup, and the first premium visual-design sprint.
 
-Fase 0 bestaat uit vier korte sprints. Elke sprint levert een concreet beslisdocument of bouwklaar artefact op.
+Current integration branch:
 
----
+```text
+project/darts-live-camera-support
+```
 
-## Sprint 0.1 — Commerciële scope
+Current product mode:
 
-### Doel
+- two-player 301/501;
+- human-confirmed scoring;
+- mock snapshot references;
+- premium TV-friendly demo;
+- automatic camera recognition deliberately deferred.
 
-Bepalen voor wie de eerste versie bedoeld is en waarom die doelgroep zou betalen.
+## Completed milestones
 
-### Kernvraag
+### Phase 0 — Definition and go/no-go
 
-Voor wie is dit probleem urgent genoeg om een eerste versie te testen of te betalen?
+Completed:
 
-### Taken
+- commercial target and value hypothesis;
+- MVP and explicit non-goals;
+- technical stack and architecture direction;
+- demo and validation plan.
 
-- Kies primaire doelgroep: dartclub, café, tornooiorganisator of recreatieve spelers.
-- Beschrijf het huidige probleem: scorefouten, traag scoreverloop, weinig overzicht, geen historiek, geen professionele schermweergave.
-- Bepaal betaalreden: tijdswinst, minder discussie, betere tornooi-ervaring, professionelere clubavond, betere stream/overlay.
-- Kies eerste commerciële belofte.
-- Bepaal wat níét beloofd wordt in MVP.
+### Phase 1 — Scoreboard prototype
 
-### Output
+Completed:
 
-- Doelgroepkeuze
-- Probleemdefinitie
-- Eerste pitchzin
-- Betaalhypothese
+- match setup for two players;
+- 301/501 selection;
+- score validation and subtraction;
+- player switching;
+- bust and exact-zero finish;
+- turn history;
+- undo and score correction;
+- mock image linkage;
+- build workflow and Codespaces support.
 
-### Definition of Done
+### Sprint 2.2.2.1 — Design foundation
 
-Sprint is klaar wanneer één primaire doelgroep is gekozen en er een korte pitch bestaat die getest kan worden bij een echte club of café.
+Status: completed and merged through PR #24.
 
----
+Delivered:
 
-## Sprint 0.2 — MVP-scope
+- shared design tokens;
+- reusable UI primitives;
+- premium scoreboard styling;
+- TV-readable scores and active-player state;
+- corrected three-column player/turn/player layout.
 
-### Doel
+## Active sprint
 
-De kleinste nuttige versie vastleggen die demo- en testbaar is zonder perfecte AI-detectie.
+### Sprint 2.2.2.2 — Responsive TV layout & kiosk mode
 
-### Kernvraag
+GitHub issue: #25
 
-Wat moet de eerste demo absoluut kunnen om geloofwaardig te zijn?
+Branch:
 
-### Taken
+```text
+feature/darts-responsive-kiosk
+```
 
-- Splits functies in must-have, should-have en later.
-- Bevestig dat automatische dartdetectie niet verplicht is voor versie 1.
-- Leg de hybride flow vast: score invoeren, camera snapshot koppelen, mens bevestigt/corrigeert.
-- Bepaal demo-scenario: 501-leg tussen twee spelers.
-- Bepaal minimale UI-schermen.
+Goal:
 
-### Output
+Make the premium demo robust on desktop, 16:9 TV, laptop, tablet, and mobile, with a safe browser-fullscreen mode.
 
-- MVP-functielijst
-- Demo-scenario
-- Niet-bouwen-lijst
-- Eerste user flow
+Scope:
 
-### Definition of Done
+- preserve `Player 1 | Current turn | Player 2` on wide screens;
+- improve 16:9 spacing and scanability;
+- define deliberate tablet/mobile stacking;
+- prevent horizontal overflow;
+- keep controls touch-friendly;
+- add defensive fullscreen enter/exit behaviour and fallback;
+- preserve all existing score behaviour.
 
-Sprint is klaar wanneer een ontwikkelaar exact weet wat in de eerste prototypeversie moet zitten en wat bewust wordt uitgesteld.
+Explicit non-goals:
 
----
+- animations;
+- winner overlay;
+- camera recognition;
+- backend or authentication;
+- new game modes or rules;
+- deployment.
 
-## Sprint 0.3 — Technische projectkeuze
+Definition of Done:
 
-### Doel
+- responsive smoke tests pass;
+- fullscreen opens and exits safely;
+- operator controls remain usable;
+- no score/name clipping;
+- existing functional flows remain intact;
+- `npm run build` and GitHub Actions succeed;
+- draft PR is created but not merged without user approval.
 
-Een technische basis kiezen die snel bouwbaar is en later camera/computer vision kan dragen.
+## Planned premium-design sprints
 
-### Kernvraag
+### Sprint 2.2.2.3 — Motion & live-state feedback
 
-Welke stack maakt de snelste demo mogelijk zonder de latere AI-route te blokkeren?
+Start only after Sprint 2.2.2.2 is merged.
 
-### Taken
+Scope:
 
-- Kies frontend stack.
-- Kies backend/API-aanpak.
-- Kies opslag voor matchdata en snapshots.
-- Bepaal of prototype lokaal, webgebaseerd of hosted wordt.
-- Bepaal camera-aanpak voor fase 1: mock image, file upload of browser camera.
-- Leg latere computer-vision route vast: OpenCV, verschilbeeld, segment mapping, confidence score.
+- restrained score-update feedback;
+- clear active-player transition;
+- short bust/status feedback;
+- stable layout during transitions;
+- `prefers-reduced-motion` support.
 
-### Output
+Not in scope:
 
-- Technische stackbeslissing
-- Architectuurschets
-- Datamodel v0
-- Camera-aanpak fase 1
+- winner overlay;
+- sound;
+- new rules;
+- camera functionality.
 
-### Definition of Done
+### Sprint 2.2.2.4 — Finish overlay & winner presentation
 
-Sprint is klaar wanneer de eerste technische bouwrichting vastligt en geen fundamentele keuzes meer openstaan voor het scoreboard prototype.
+Start only after Sprint 2.2.2.3 is merged.
 
----
+Scope:
 
-## Sprint 0.4 — Demo- en validatieplan
+- premium finished-match state;
+- clear winner presentation;
+- close/return behaviour;
+- TV, tablet, and mobile compatibility;
+- no heavy celebration dependency.
 
-### Doel
+### Sprint 2.2.2.5 — Premium demo QA & accessibility
 
-Bepalen hoe de eerste demo getest wordt bij echte gebruikers of kopers.
+Start only after Sprint 2.2.2.4 is merged.
 
-### Kernvraag
+Scope:
 
-Hoe krijgen we zo snel mogelijk bewijs dat dit nuttig of verkoopbaar is?
+- contrast and readability;
+- keyboard and focus behaviour;
+- touch targets;
+- long names and extreme UI states;
+- fullscreen/browser fallbacks;
+- final cross-viewport regression;
+- demo screenshots and remaining style cleanup.
 
-### Taken
+When complete, parent issue #22 — Premium visual design — may be closed after final validation.
 
-- Maak een demo-script van maximaal 2 minuten.
-- Maak vijf validatievragen voor clubs/cafés.
-- Bepaal welke feedback gemeten wordt.
-- Bepaal eerste prijs-/pakkettest.
-- Maak lijst van 5 mogelijke testlocaties of profielen.
+## Next commercial phase: pilot-ready demo
 
-### Output
+After Sprint 2.2.2.5, hold a product go/no-go review before computer-vision work.
 
-- Demo-script
-- Validatievragen
-- Feedbackcriteria
-- Eerste prijs-/pakketopties
+Proposed sequence:
 
-### Definition of Done
+1. **2.3.1 — Operator workflow & match controls**
+2. **2.3.2 — Online preview deployment**
+3. **2.3.3 — Café/dart-club pilot feedback**
+4. **2.3.4 — Camera feasibility spike**
 
-Sprint is klaar wanneer het prototype niet alleen gebouwd kan worden, maar ook getest kan worden bij een echte doelgroep.
+The camera feasibility spike begins only after the scoreboard workflow has demonstrated real user value.
 
----
+## Standard execution flow
 
-## Sprintvolgorde
+Each implementation sprint uses this sequential gate:
 
-1. Sprint 0.1 — Commerciële scope
-2. Sprint 0.2 — MVP-scope
-3. Sprint 0.3 — Technische projectkeuze
-4. Sprint 0.4 — Demo- en validatieplan
+```text
+orientation and scope
+→ implementation
+→ sprint-specific specialist pass
+→ independent regression QA
+→ draft PR
+→ explicit human merge approval
+```
 
-## Fase 0 eindbeslissing
-
-Na deze vier sprints moet beslist worden:
-
-- primaire doelgroep;
-- exacte MVP-scope;
-- technische stack;
-- eerste demo-flow;
-- wat expliciet niet gebouwd wordt;
-- of het project doorgaat naar Fase 1: Scoreboard Prototype.
+Project-specific details are defined in `AGENTS.md`. One active issue and one feature branch remain the default unit of work.
