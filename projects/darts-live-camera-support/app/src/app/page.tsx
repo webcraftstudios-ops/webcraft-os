@@ -146,6 +146,7 @@ export default function HomePage() {
                 <CameraPanel
                   pendingSnapshotUrl={pendingSnapshotUrl}
                   lastSnapshotUrl={lastSnapshotUrl}
+                  turnCount={matchState.turns.length}
                   onCreateSnapshot={handleCaptureSnapshot}
                   onClearSnapshot={handleDiscardSnapshot}
                 />

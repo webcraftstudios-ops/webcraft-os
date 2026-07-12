@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Panel } from '@/components/ui/Panel';
 import { CameraPreview, type CameraPreviewRef } from '@/components/CameraPreview';
@@ -12,6 +12,14 @@ const TAPO_BRIDGE_URL = process.env.NEXT_PUBLIC_TAPO_BRIDGE_URL ?? '';
 export type CameraPanelProps = {
   pendingSnapshotUrl: string | null;
   lastSnapshotUrl?: string | null;
+  /**
+   * Number of confirmed turns so far (e.g. `matchState.turns.length`). Used
+   * only to detect whether a score was confirmed while an IP-camera fetch
+   * was still in flight, so a late-arriving snapshot isn't silently attached
+   * to the wrong (next) turn. Optional/defaulted so existing callers and
+   * tests that don't care about this edge case are unaffected.
+   */
+  turnCount?: number;
   onCreateSnapshot: (base64Url: string, source?: SnapshotSource) => void;
   onClearSnapshot: () => void;
 };
@@ -21,6 +29,7 @@ type CameraMode = 'browser' | 'rtsp';
 export function CameraPanel({
   pendingSnapshotUrl,
   lastSnapshotUrl,
+  turnCount = 0,
   onCreateSnapshot,
   onClearSnapshot,
 }: CameraPanelProps) {
@@ -28,6 +37,13 @@ export function CameraPanel({
   const [mode, setMode] = useState<CameraMode>('browser');
   const [isFetchingRtsp, setIsFetchingRtsp] = useState(false);
   const [rtspError, setRtspError] = useState<string | null>(null);
+
+  // Always-current turn count, readable from inside the async
+  // handleCaptureRtsp closure after it has already started awaiting.
+  const turnCountRef = useRef(turnCount);
+  useEffect(() => {
+    turnCountRef.current = turnCount;
+  }, [turnCount]);
 
   function handleModeChange(nextMode: CameraMode) {
     setMode(nextMode);
@@ -44,10 +60,19 @@ export function CameraPanel({
   async function handleCaptureRtsp() {
     setIsFetchingRtsp(true);
     setRtspError(null);
+    const requestedAtTurnCount = turnCountRef.current;
     try {
       const result = await fetchRtspSnapshot(TAPO_BRIDGE_URL);
       if (!result.success) {
         setRtspError(result.error);
+        return;
+      }
+      if (turnCountRef.current !== requestedAtTurnCount) {
+        // A score was confirmed (and the turn advanced) while this fetch was
+        // still in flight. Attaching it now would silently associate this
+        // photo with the *next* turn instead of the one it was actually
+        // taken for, so discard it and let the operator recapture manually.
+        setRtspError('A new turn was confirmed before this IP camera image arrived; snapshot discarded to avoid attaching it to the wrong turn.');
         return;
       }
       onCreateSnapshot(result.dataUrl, 'rtsp');
@@ -62,6 +87,7 @@ export function CameraPanel({
   }
 
   const isRtspMode = mode === 'rtsp';
+  const showRtspPlaceholder = isRtspMode && !pendingSnapshotUrl && !lastSnapshotUrl;
 
   return (
     <Panel
@@ -89,7 +115,7 @@ export function CameraPanel({
       </div>
 
       <div className="h-64 rounded-xl">
-        {isRtspMode && !pendingSnapshotUrl ? (
+        {showRtspPlaceholder ? (
           <div className="flex h-full flex-col items-center justify-center rounded-xl border border-[var(--dl-border)] bg-black p-4 text-center">
             {rtspError ? (
               <p className="text-sm text-[var(--dl-muted)]">{rtspError}</p>

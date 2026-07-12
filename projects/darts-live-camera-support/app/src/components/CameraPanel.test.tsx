@@ -13,9 +13,15 @@ const mockCapture = vi.fn<[], string | null>();
 
 vi.mock('@/components/CameraPreview', () => ({
   CameraPreview: forwardRef<{ capture: () => string | null }, { isLive?: boolean; snapshotUrl?: string | null }>(
-    (_props, ref) => {
+    ({ isLive, snapshotUrl }, ref) => {
       useImperativeHandle(ref, () => ({ capture: mockCapture }));
-      return <div data-testid="camera-preview-mock" />;
+      return (
+        <div
+          data-testid="camera-preview-mock"
+          data-is-live={String(!!isLive)}
+          data-snapshot-url={snapshotUrl ?? ''}
+        />
+      );
     }
   ),
 }));
@@ -196,6 +202,103 @@ describe('CameraPanel', () => {
       });
       expect(screen.getByRole('button', { name: 'Capture Snapshot' })).not.toBeDisabled();
       expect(onCreateSnapshot).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('last snapshot visibility after score confirmation', () => {
+    it('keeps the last confirmed snapshot visible in IP Camera mode once the pending snapshot is cleared', () => {
+      render(
+        <CameraPanel
+          pendingSnapshotUrl={null}
+          lastSnapshotUrl="data:image/jpeg;base64,LAST_CONFIRMED"
+          onCreateSnapshot={vi.fn()}
+          onClearSnapshot={vi.fn()}
+        />
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+
+      // Must NOT fall back to the "press Capture Snapshot" placeholder when a
+      // last confirmed image already exists.
+      expect(screen.queryByText(/pull a fresh frame from the IP camera bridge/i)).not.toBeInTheDocument();
+      expect(screen.getByTestId('camera-preview-mock')).toHaveAttribute(
+        'data-snapshot-url',
+        'data:image/jpeg;base64,LAST_CONFIRMED'
+      );
+    });
+
+    it('still shows the placeholder in IP Camera mode when there is neither a pending nor a last snapshot', () => {
+      render(
+        <CameraPanel pendingSnapshotUrl={null} lastSnapshotUrl={null} onCreateSnapshot={vi.fn()} onClearSnapshot={vi.fn()} />
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+
+      expect(screen.getByText(/pull a fresh frame from the IP camera bridge/i)).toBeInTheDocument();
+    });
+  });
+
+  describe('capture/confirm race condition', () => {
+    it('discards a snapshot that arrives after a new turn was confirmed while the fetch was in flight', async () => {
+      let resolveFetch!: (value: { success: true; dataUrl: string }) => void;
+      vi.mocked(fetchRtspSnapshot).mockReturnValue(
+        new Promise((resolve) => {
+          resolveFetch = resolve;
+        })
+      );
+      const onCreateSnapshot = vi.fn();
+      const { rerender } = render(
+        <CameraPanel
+          pendingSnapshotUrl={null}
+          turnCount={0}
+          onCreateSnapshot={onCreateSnapshot}
+          onClearSnapshot={vi.fn()}
+        />
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+
+      // Simulate the score being confirmed (turn advances) while the RTSP
+      // fetch triggered above is still in flight.
+      rerender(
+        <CameraPanel
+          pendingSnapshotUrl={null}
+          turnCount={1}
+          onCreateSnapshot={onCreateSnapshot}
+          onClearSnapshot={vi.fn()}
+        />
+      );
+
+      resolveFetch({ success: true, dataUrl: 'data:image/jpeg;base64,STALE' });
+
+      await waitFor(() => {
+        expect(screen.getByText(/snapshot discarded/i)).toBeInTheDocument();
+      });
+      expect(onCreateSnapshot).not.toHaveBeenCalled();
+    });
+
+    it('still attaches the snapshot normally when no turn was confirmed while fetching', async () => {
+      vi.mocked(fetchRtspSnapshot).mockResolvedValue({
+        success: true,
+        dataUrl: 'data:image/jpeg;base64,OK',
+      });
+      const onCreateSnapshot = vi.fn();
+      render(
+        <CameraPanel
+          pendingSnapshotUrl={null}
+          turnCount={0}
+          onCreateSnapshot={onCreateSnapshot}
+          onClearSnapshot={vi.fn()}
+        />
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+
+      await waitFor(() => {
+        expect(onCreateSnapshot).toHaveBeenCalledWith('data:image/jpeg;base64,OK', 'rtsp');
+      });
     });
   });
 });
