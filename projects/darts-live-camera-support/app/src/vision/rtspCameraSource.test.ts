@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { fetchRtspSnapshot } from './rtspCameraSource';
 
 describe('fetchRtspSnapshot', () => {
@@ -25,10 +25,14 @@ describe('fetchRtspSnapshot', () => {
 
     const result = await fetchRtspSnapshot('http://localhost:8089');
 
-    expect(fetchMock).toHaveBeenCalledWith('http://localhost:8089/snapshot', {
-      method: 'GET',
-      cache: 'no-store',
-    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:8089/snapshot',
+      expect.objectContaining({
+        method: 'GET',
+        cache: 'no-store',
+        signal: expect.any(AbortSignal),
+      })
+    );
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.dataUrl.startsWith('data:image/jpeg;base64,')).toBe(true);
@@ -137,5 +141,96 @@ describe('fetchRtspSnapshot', () => {
     if (secondAttempt.success) {
       expect(secondAttempt.dataUrl.startsWith('data:image/jpeg;base64,')).toBe(true);
     }
+  });
+
+  describe('timeout handling', () => {
+    // Only fake the timer APIs our own timeout logic uses; jsdom's FileReader
+    // relies on real async scheduling internally to fire its load events.
+    const fakeTimerOptions = { toFake: ['setTimeout', 'clearTimeout'] } as const;
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('aborts and returns a timeout error when the bridge does not respond in time', async () => {
+      vi.useFakeTimers(fakeTimerOptions);
+      const fetchMock = vi.fn((_url: string, options: { signal: AbortSignal }) => {
+        return new Promise((_resolve, reject) => {
+          options.signal.addEventListener('abort', () => {
+            reject(new DOMException('The operation was aborted.', 'AbortError'));
+          });
+        });
+      });
+      vi.stubGlobal('fetch', fetchMock);
+
+      const resultPromise = fetchRtspSnapshot('http://localhost:8089', 5000);
+      await vi.advanceTimersByTimeAsync(5000);
+      const result = await resultPromise;
+
+      expect(result).toEqual({
+        success: false,
+        error: 'IP camera bridge did not respond within 5s. Check the camera and bridge are running.',
+      });
+    });
+
+    it('passes an abort signal to fetch so a slow bridge can actually be cancelled', async () => {
+      vi.useFakeTimers(fakeTimerOptions);
+      const fetchMock = vi.fn((_url: string, options: { signal: AbortSignal }) => {
+        return new Promise((_resolve, reject) => {
+          options.signal.addEventListener('abort', () => {
+            reject(new DOMException('The operation was aborted.', 'AbortError'));
+          });
+        });
+      });
+      vi.stubGlobal('fetch', fetchMock);
+
+      const resultPromise = fetchRtspSnapshot('http://localhost:8089', 3000);
+      await vi.advanceTimersByTimeAsync(3000);
+      await resultPromise;
+
+      const signal = fetchMock.mock.calls[0][1].signal as AbortSignal;
+      expect(signal.aborted).toBe(true);
+    });
+
+    it('resolves normally without a timeout error when the bridge responds well within the deadline', async () => {
+      vi.useFakeTimers(fakeTimerOptions);
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        blob: async () => new Blob(['fake-jpeg-bytes'], { type: 'image/jpeg' }),
+      });
+      vi.stubGlobal('fetch', fetchMock);
+
+      const result = await fetchRtspSnapshot('http://localhost:8089', 5000);
+
+      expect(result.success).toBe(true);
+
+      // Advancing time after a successful response must not retroactively
+      // trigger an abort/timeout error - the internal timer should already
+      // have been cleared.
+      await vi.advanceTimersByTimeAsync(10000);
+      expect(result.success).toBe(true);
+    });
+
+    it('uses an 8 second default timeout when none is specified', async () => {
+      vi.useFakeTimers(fakeTimerOptions);
+      const fetchMock = vi.fn((_url: string, options: { signal: AbortSignal }) => {
+        return new Promise((_resolve, reject) => {
+          options.signal.addEventListener('abort', () => {
+            reject(new DOMException('The operation was aborted.', 'AbortError'));
+          });
+        });
+      });
+      vi.stubGlobal('fetch', fetchMock);
+
+      const resultPromise = fetchRtspSnapshot('http://localhost:8089');
+      await vi.advanceTimersByTimeAsync(8000);
+      const result = await resultPromise;
+
+      expect(result).toEqual({
+        success: false,
+        error: 'IP camera bridge did not respond within 8s. Check the camera and bridge are running.',
+      });
+    });
   });
 });
