@@ -301,4 +301,102 @@ describe('CameraPanel', () => {
       });
     });
   });
+
+  describe('error visibility independent of the placeholder (regression: error hidden behind last snapshot)', () => {
+    it('keeps the last snapshot visible AND shows the error when a new RTSP capture fails', async () => {
+      vi.mocked(fetchRtspSnapshot).mockResolvedValue({
+        success: false,
+        error: 'Could not reach the IP camera bridge. Is it running on the local network?',
+      });
+      render(
+        <CameraPanel
+          pendingSnapshotUrl={null}
+          lastSnapshotUrl="data:image/jpeg;base64,LAST_CONFIRMED"
+          onCreateSnapshot={vi.fn()}
+          onClearSnapshot={vi.fn()}
+        />
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Could not reach the IP camera bridge. Is it running on the local network?')
+        ).toBeInTheDocument();
+      });
+
+      // The last confirmed image must stay visible - the error must not hide it.
+      expect(screen.getByTestId('camera-preview-mock')).toHaveAttribute(
+        'data-snapshot-url',
+        'data:image/jpeg;base64,LAST_CONFIRMED'
+      );
+      expect(screen.getByRole('button', { name: 'Capture Snapshot' })).not.toBeDisabled();
+    });
+
+    it('shows the error when there is no previous snapshot and the fetch fails', async () => {
+      vi.mocked(fetchRtspSnapshot).mockResolvedValue({
+        success: false,
+        error: 'IP camera bridge returned an error (HTTP 502).',
+      });
+      render(<CameraPanel pendingSnapshotUrl={null} onCreateSnapshot={vi.fn()} onClearSnapshot={vi.fn()} />);
+
+      fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('IP camera bridge returned an error (HTTP 502).')).toBeInTheDocument();
+      });
+    });
+
+    it('clears the error and creates a pending snapshot once a retry succeeds', async () => {
+      vi.mocked(fetchRtspSnapshot)
+        .mockResolvedValueOnce({ success: false, error: 'Bridge unreachable.' })
+        .mockResolvedValueOnce({ success: true, dataUrl: 'data:image/jpeg;base64,RETRY_OK' });
+      const onCreateSnapshot = vi.fn();
+      render(
+        <CameraPanel
+          pendingSnapshotUrl={null}
+          lastSnapshotUrl="data:image/jpeg;base64,LAST_CONFIRMED"
+          onCreateSnapshot={onCreateSnapshot}
+          onClearSnapshot={vi.fn()}
+        />
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+      await waitFor(() => {
+        expect(screen.getByText('Bridge unreachable.')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+
+      await waitFor(() => {
+        expect(onCreateSnapshot).toHaveBeenCalledWith('data:image/jpeg;base64,RETRY_OK', 'rtsp');
+      });
+      expect(screen.queryByText('Bridge unreachable.')).not.toBeInTheDocument();
+    });
+
+    it('hides the RTSP error once the operator switches to Browser Camera mode', async () => {
+      vi.mocked(fetchRtspSnapshot).mockResolvedValue({ success: false, error: 'Bridge unreachable.' });
+      render(
+        <CameraPanel
+          pendingSnapshotUrl={null}
+          lastSnapshotUrl="data:image/jpeg;base64,LAST_CONFIRMED"
+          onCreateSnapshot={vi.fn()}
+          onClearSnapshot={vi.fn()}
+        />
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+      await waitFor(() => {
+        expect(screen.getByText('Bridge unreachable.')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByRole('button', { name: 'Browser Camera' }));
+
+      expect(screen.queryByText('Bridge unreachable.')).not.toBeInTheDocument();
+    });
+  });
 });

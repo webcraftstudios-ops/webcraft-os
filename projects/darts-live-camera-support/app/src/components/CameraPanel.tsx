@@ -117,13 +117,9 @@ export function CameraPanel({
       <div className="h-64 rounded-xl">
         {showRtspPlaceholder ? (
           <div className="flex h-full flex-col items-center justify-center rounded-xl border border-[var(--dl-border)] bg-black p-4 text-center">
-            {rtspError ? (
-              <p className="text-sm text-[var(--dl-muted)]">{rtspError}</p>
-            ) : (
-              <p className="text-sm text-[var(--dl-muted)]">
-                Press &ldquo;Capture Snapshot&rdquo; to pull a fresh frame from the IP camera bridge.
-              </p>
-            )}
+            <p className="text-sm text-[var(--dl-muted)]">
+              Press &ldquo;Capture Snapshot&rdquo; to pull a fresh frame from the IP camera bridge.
+            </p>
           </div>
         ) : (
           <CameraPreview
@@ -133,6 +129,12 @@ export function CameraPanel({
           />
         )}
       </div>
+
+      {isRtspMode && rtspError ? (
+        <p className="mt-3 text-sm font-semibold text-red-400" role="alert">
+          {rtspError}
+        </p>
+      ) : null}
 
       <div className="mt-5 flex flex-col gap-3 md:flex-row">
         <Button
