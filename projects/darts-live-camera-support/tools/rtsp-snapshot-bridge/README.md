@@ -34,7 +34,21 @@ cp .env.example .env
 # .env
 RTSP_URL=rtsp://camera_user:camera_password@192.168.1.50:554/stream2
 PORT=8089
+ALLOWED_ORIGIN=http://localhost:3000
+BRIDGE_HOST=127.0.0.1
 ```
+
+- `ALLOWED_ORIGIN` (optional): restricts which browser origin may fetch
+  `GET /snapshot` (CORS). Defaults to `http://localhost:3000`, the app's local
+  dev origin. Only change this if the app is served from a different local
+  origin.
+- `BRIDGE_HOST` (optional): bind address for the bridge's HTTP server.
+  Defaults to `127.0.0.1` (localhost-only), since the current pilot setup
+  always runs the bridge on the same machine as the app. Set this to `0.0.0.0`
+  **only** if the app and bridge run on two separate devices on the same local
+  network — this exposes `/snapshot` (and therefore the camera feed) to that
+  whole network, so opt in deliberately and understand the exposure before
+  doing so.
 
 ## Run
 
@@ -49,8 +63,23 @@ The bridge then exposes:
 GET /snapshot -> image/jpeg (one fresh frame pulled from the RTSP stream)
 ```
 
+Every response (success or error) includes an `Access-Control-Allow-Origin`
+header restricted to `ALLOWED_ORIGIN`, so the browser is permitted to read it
+when the Next.js app (a different origin/port) fetches it directly.
+
 Point the app's `NEXT_PUBLIC_TAPO_BRIDGE_URL` (see `app/.env.example`) at this
 bridge's base URL, e.g. `http://localhost:8089`.
+
+## Tests
+
+```bash
+npm test
+```
+
+Runs Node's built-in test runner (`node --test`) against `server.test.js`,
+covering the CORS headers on success/error/unknown-route responses and the
+localhost-only default bind address. No new dependency is added for this —
+the bridge stays dependency-free by design.
 
 ## Out of scope
 
