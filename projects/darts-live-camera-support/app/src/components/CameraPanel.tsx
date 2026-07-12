@@ -44,14 +44,21 @@ export function CameraPanel({
   async function handleCaptureRtsp() {
     setIsFetchingRtsp(true);
     setRtspError(null);
-    const result = await fetchRtspSnapshot(TAPO_BRIDGE_URL);
-    setIsFetchingRtsp(false);
-
-    if (!result.success) {
-      setRtspError(result.error);
-      return;
+    try {
+      const result = await fetchRtspSnapshot(TAPO_BRIDGE_URL);
+      if (!result.success) {
+        setRtspError(result.error);
+        return;
+      }
+      onCreateSnapshot(result.dataUrl, 'rtsp');
+    } catch {
+      // Defense in depth: fetchRtspSnapshot is designed to never throw, but
+      // if it unexpectedly does, still recover gracefully instead of leaving
+      // the capture button stuck on "Fetching...".
+      setRtspError('Unexpected error while capturing from the IP camera.');
+    } finally {
+      setIsFetchingRtsp(false);
     }
-    onCreateSnapshot(result.dataUrl, 'rtsp');
   }
 
   const isRtspMode = mode === 'rtsp';

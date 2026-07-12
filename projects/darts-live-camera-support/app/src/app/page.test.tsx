@@ -132,4 +132,56 @@ describe('Snapshot flow integration (CameraPanel -> onCreateSnapshot -> TurnHist
     const turn3Image = screen.getByAltText('Turn 3 snapshot') as HTMLImageElement;
     expect(turn3Image.src).toBe('data:image/jpeg;base64,TURN_3_PLAYER_1');
   });
+
+  it('lets the operator confirm the score manually when the IP camera capture fails (no snapshot blocks the flow)', async () => {
+    vi.mocked(fetchRtspSnapshot).mockResolvedValue({
+      success: false,
+      error: 'Could not reach the IP camera bridge. Is it running on the local network?',
+    });
+    render(<HomePage />);
+
+    startDefaultMatch();
+
+    fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Could not reach the IP camera bridge. Is it running on the local network?')
+      ).toBeInTheDocument();
+    });
+
+    // Human-confirmed fallback: the operator can still enter the score by hand.
+    confirmScore('60');
+
+    expect(screen.getByText('Turn #1')).toBeInTheDocument();
+    expect(screen.getAllByText('After: 441').length).toBeGreaterThan(0);
+    expect(screen.queryByAltText('Turn 1 snapshot')).not.toBeInTheDocument();
+  });
+
+  it('recovers from a failed IP camera capture and successfully attaches a snapshot on retry', async () => {
+    vi.mocked(fetchRtspSnapshot)
+      .mockResolvedValueOnce({ success: false, error: 'Bridge unreachable.' })
+      .mockResolvedValueOnce({ success: true, dataUrl: 'data:image/jpeg;base64,RECOVERED' });
+    render(<HomePage />);
+
+    startDefaultMatch();
+
+    fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+    await waitFor(() => {
+      expect(screen.getByText('Bridge unreachable.')).toBeInTheDocument();
+    });
+
+    // Retry the capture (same turn, no score confirmed yet).
+    fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+    await waitFor(() => {
+      expect(screen.getByText(/IP camera image captured for the next confirmed score\./i)).toBeInTheDocument();
+    });
+
+    confirmScore('60');
+
+    const snapshotImage = screen.getByAltText('Turn 1 snapshot') as HTMLImageElement;
+    expect(snapshotImage.src).toBe('data:image/jpeg;base64,RECOVERED');
+  });
 });

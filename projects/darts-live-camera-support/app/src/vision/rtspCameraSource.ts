@@ -28,27 +28,30 @@ export async function fetchRtspSnapshot(bridgeUrl: string): Promise<RtspSnapshot
     return { success: false, error: 'No IP camera bridge URL configured.' };
   }
 
-  let response: Response;
   try {
-    response = await fetch(`${bridgeUrl.replace(/\/$/, '')}/snapshot`, {
+    const response = await fetch(`${bridgeUrl.replace(/\/$/, '')}/snapshot`, {
       method: 'GET',
       cache: 'no-store',
     });
+
+    if (!response.ok) {
+      return { success: false, error: `IP camera bridge returned an error (HTTP ${response.status}).` };
+    }
+
+    const blob = await response.blob();
+    if (!blob.type.startsWith('image/')) {
+      return { success: false, error: 'IP camera bridge did not return an image.' };
+    }
+
+    const dataUrl = await blobToDataUrl(blob);
+    return { success: true, dataUrl };
   } catch {
+    // Covers network failures (fetch rejects) as well as a corrupted/partial
+    // response (blob()/FileReader rejecting) - either way this must resolve
+    // to a graceful error result, never throw, so the UI can always fall
+    // back to manual score entry instead of getting stuck.
     return { success: false, error: 'Could not reach the IP camera bridge. Is it running on the local network?' };
   }
-
-  if (!response.ok) {
-    return { success: false, error: `IP camera bridge returned an error (HTTP ${response.status}).` };
-  }
-
-  const blob = await response.blob();
-  if (!blob.type.startsWith('image/')) {
-    return { success: false, error: 'IP camera bridge did not return an image.' };
-  }
-
-  const dataUrl = await blobToDataUrl(blob);
-  return { success: true, dataUrl };
 }
 
 function blobToDataUrl(blob: Blob): Promise<string> {

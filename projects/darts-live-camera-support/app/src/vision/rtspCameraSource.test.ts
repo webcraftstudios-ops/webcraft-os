@@ -91,4 +91,51 @@ describe('fetchRtspSnapshot', () => {
       error: 'IP camera bridge did not return an image.',
     });
   });
+
+  it('recovers gracefully (instead of rejecting) when the response body is corrupted mid-transfer', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      blob: async () => {
+        throw new Error('network read failed');
+      },
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(fetchRtspSnapshot('http://localhost:8089')).resolves.toEqual({
+      success: false,
+      error: 'Could not reach the IP camera bridge. Is it running on the local network?',
+    });
+  });
+
+  it('recovers gracefully when fetch rejects with a non-Error value', async () => {
+    const fetchMock = vi.fn().mockRejectedValue('connection reset');
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(fetchRtspSnapshot('http://localhost:8089')).resolves.toEqual({
+      success: false,
+      error: 'Could not reach the IP camera bridge. Is it running on the local network?',
+    });
+  });
+
+  it('allows a retry to succeed right after a failed attempt (no lingering broken state)', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('ECONNREFUSED'))
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        blob: async () => new Blob(['fake-jpeg-bytes'], { type: 'image/jpeg' }),
+      });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const firstAttempt = await fetchRtspSnapshot('http://localhost:8089');
+    expect(firstAttempt.success).toBe(false);
+
+    const secondAttempt = await fetchRtspSnapshot('http://localhost:8089');
+    expect(secondAttempt.success).toBe(true);
+    if (secondAttempt.success) {
+      expect(secondAttempt.dataUrl.startsWith('data:image/jpeg;base64,')).toBe(true);
+    }
+  });
 });

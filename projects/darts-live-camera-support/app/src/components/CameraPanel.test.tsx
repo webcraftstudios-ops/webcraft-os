@@ -118,4 +118,84 @@ describe('CameraPanel', () => {
     fireEvent.click(discardButton);
     expect(onClearSnapshot).toHaveBeenCalledTimes(1);
   });
+
+  describe('network failure recovery', () => {
+    it('shows "Fetching..." while the request is in flight, then recovers to a clickable state on failure', async () => {
+      let resolveFetch!: (value: { success: false; error: string }) => void;
+      vi.mocked(fetchRtspSnapshot).mockReturnValue(
+        new Promise((resolve) => {
+          resolveFetch = resolve;
+        })
+      );
+      render(<CameraPanel pendingSnapshotUrl={null} onCreateSnapshot={vi.fn()} onClearSnapshot={vi.fn()} />);
+
+      fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+
+      const captureButton = screen.getByRole('button', { name: 'Fetching...' });
+      expect(captureButton).toBeDisabled();
+
+      resolveFetch({ success: false, error: 'Could not reach the IP camera bridge.' });
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Capture Snapshot' })).not.toBeDisabled();
+      });
+      expect(screen.queryByRole('button', { name: 'Fetching...' })).not.toBeInTheDocument();
+    });
+
+    it('allows a successful retry immediately after a failed capture attempt', async () => {
+      vi.mocked(fetchRtspSnapshot)
+        .mockResolvedValueOnce({ success: false, error: 'Could not reach the IP camera bridge.' })
+        .mockResolvedValueOnce({ success: true, dataUrl: 'data:image/jpeg;base64,RETRY_OK' });
+      const onCreateSnapshot = vi.fn();
+      render(<CameraPanel pendingSnapshotUrl={null} onCreateSnapshot={onCreateSnapshot} onClearSnapshot={vi.fn()} />);
+
+      fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Could not reach the IP camera bridge.')).toBeInTheDocument();
+      });
+      expect(onCreateSnapshot).not.toHaveBeenCalled();
+
+      // Retry without leaving IP Camera mode.
+      fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+
+      await waitFor(() => {
+        expect(onCreateSnapshot).toHaveBeenCalledWith('data:image/jpeg;base64,RETRY_OK', 'rtsp');
+      });
+    });
+
+    it('clears a previous error message when switching camera mode away and back', async () => {
+      vi.mocked(fetchRtspSnapshot).mockResolvedValue({ success: false, error: 'Bridge unreachable.' });
+      render(<CameraPanel pendingSnapshotUrl={null} onCreateSnapshot={vi.fn()} onClearSnapshot={vi.fn()} />);
+
+      fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+      await waitFor(() => {
+        expect(screen.getByText('Bridge unreachable.')).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByRole('button', { name: 'Browser Camera' }));
+      fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+
+      expect(screen.queryByText('Bridge unreachable.')).not.toBeInTheDocument();
+      expect(screen.getByText(/pull a fresh frame from the IP camera bridge/i)).toBeInTheDocument();
+    });
+
+    it('recovers to a clickable state and shows a fallback message if the fetch call itself unexpectedly throws', async () => {
+      vi.mocked(fetchRtspSnapshot).mockRejectedValue(new Error('unexpected'));
+      const onCreateSnapshot = vi.fn();
+      render(<CameraPanel pendingSnapshotUrl={null} onCreateSnapshot={onCreateSnapshot} onClearSnapshot={vi.fn()} />);
+
+      fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+      fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Unexpected error while capturing from the IP camera.')).toBeInTheDocument();
+      });
+      expect(screen.getByRole('button', { name: 'Capture Snapshot' })).not.toBeDisabled();
+      expect(onCreateSnapshot).not.toHaveBeenCalled();
+    });
+  });
 });
