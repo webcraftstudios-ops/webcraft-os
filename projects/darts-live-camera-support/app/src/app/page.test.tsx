@@ -44,13 +44,25 @@ function confirmScore(score: string) {
   fireEvent.click(screen.getByRole('button', { name: 'Confirm score' }));
 }
 
+function selectPerDart() {
+  fireEvent.click(screen.getByRole('button', { name: 'Per Dart' }));
+}
+
+function addS20T20D20() {
+  fireEvent.click(screen.getByRole('button', { name: 'Add S20' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Triple' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Add T20' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Double' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Add D20' }));
+}
+
 describe('Snapshot flow integration (CameraPanel -> onCreateSnapshot -> TurnHistory)', () => {
   beforeEach(() => {
     mockCapture.mockReset();
     vi.mocked(fetchRtspSnapshot).mockReset();
   });
 
-  it('attaches a browser-camera snapshot to the confirmed turn and shows it in Turn History', () => {
+  it('attaches a browser-camera snapshot to a Quick Total turn and shows it in Turn History', () => {
     mockCapture.mockReturnValue('data:image/jpeg;base64,BROWSER_SNAPSHOT');
     render(<HomePage />);
 
@@ -65,9 +77,26 @@ describe('Snapshot flow integration (CameraPanel -> onCreateSnapshot -> TurnHist
     expect(snapshotImage.src).toBe('data:image/jpeg;base64,BROWSER_SNAPSHOT');
     expect(screen.getByText('Turn #1')).toBeInTheDocument();
     expect(screen.getAllByText('After: 441').length).toBeGreaterThan(0);
+    expect(screen.queryByText(/^Darts:/)).not.toBeInTheDocument();
   });
 
-  it('attaches an IP-camera (RTSP) snapshot to the confirmed turn and shows it in Turn History', async () => {
+  it('attaches a browser-camera snapshot to a Per Dart turn', () => {
+    mockCapture.mockReturnValue('data:image/jpeg;base64,PER_DART_BROWSER');
+    render(<HomePage />);
+
+    startDefaultMatch();
+    selectPerDart();
+    fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+    addS20T20D20();
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm turn' }));
+
+    expect(screen.getByText('Darts: S20 · T20 · D20')).toBeInTheDocument();
+    const snapshotImage = screen.getByAltText('Turn 1 snapshot') as HTMLImageElement;
+    expect(snapshotImage.src).toBe('data:image/jpeg;base64,PER_DART_BROWSER');
+    expect(screen.getAllByText('After: 381').length).toBeGreaterThan(0);
+  });
+
+  it('attaches an IP-camera (RTSP) snapshot to a Quick Total turn', async () => {
     vi.mocked(fetchRtspSnapshot).mockResolvedValue({
       success: true,
       dataUrl: 'data:image/jpeg;base64,RTSP_SNAPSHOT',
@@ -87,6 +116,33 @@ describe('Snapshot flow integration (CameraPanel -> onCreateSnapshot -> TurnHist
 
     const snapshotImage = screen.getByAltText('Turn 1 snapshot') as HTMLImageElement;
     expect(snapshotImage.src).toBe('data:image/jpeg;base64,RTSP_SNAPSHOT');
+  });
+
+  it('attaches an IP-camera (RTSP) snapshot to a Per Dart turn', async () => {
+    vi.mocked(fetchRtspSnapshot).mockResolvedValue({
+      success: true,
+      dataUrl: 'data:image/jpeg;base64,PER_DART_RTSP',
+    });
+    render(<HomePage />);
+
+    startDefaultMatch();
+    selectPerDart();
+    fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/IP camera image captured for the next confirmed score\./i)).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add MISS' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add S5' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Double' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add D10' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm turn' }));
+
+    expect(screen.getByText('Darts: MISS · S5 · D10')).toBeInTheDocument();
+    const snapshotImage = screen.getByAltText('Turn 1 snapshot') as HTMLImageElement;
+    expect(snapshotImage.src).toBe('data:image/jpeg;base64,PER_DART_RTSP');
   });
 
   it('does not attach a snapshot to the turn when the pending image is discarded first', () => {
@@ -109,31 +165,27 @@ describe('Snapshot flow integration (CameraPanel -> onCreateSnapshot -> TurnHist
 
     startDefaultMatch();
 
-    // Turn 1: Player 1 with a captured snapshot.
     mockCapture.mockReturnValue('data:image/jpeg;base64,TURN_1_PLAYER_1');
     fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
-    confirmScore('60'); // Player 1: 501 -> 441
+    confirmScore('60');
 
-    // Turn 2: Player 2, no snapshot captured this time.
-    confirmScore('45'); // Player 2: 501 -> 456
+    confirmScore('45');
 
-    // Turn 3: Player 1 again, with a new, different snapshot.
     mockCapture.mockReturnValue('data:image/jpeg;base64,TURN_3_PLAYER_1');
     fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
-    confirmScore('20'); // Player 1: 441 -> 421
+    confirmScore('20');
 
     expect(screen.getByText('3 turns')).toBeInTheDocument();
-
-    const turn1Image = screen.getByAltText('Turn 1 snapshot') as HTMLImageElement;
-    expect(turn1Image.src).toBe('data:image/jpeg;base64,TURN_1_PLAYER_1');
-
+    expect((screen.getByAltText('Turn 1 snapshot') as HTMLImageElement).src).toBe(
+      'data:image/jpeg;base64,TURN_1_PLAYER_1',
+    );
     expect(screen.queryByAltText('Turn 2 snapshot')).not.toBeInTheDocument();
-
-    const turn3Image = screen.getByAltText('Turn 3 snapshot') as HTMLImageElement;
-    expect(turn3Image.src).toBe('data:image/jpeg;base64,TURN_3_PLAYER_1');
+    expect((screen.getByAltText('Turn 3 snapshot') as HTMLImageElement).src).toBe(
+      'data:image/jpeg;base64,TURN_3_PLAYER_1',
+    );
   });
 
-  it('lets the operator confirm the score manually when the IP camera capture fails (no snapshot blocks the flow)', async () => {
+  it('lets the operator confirm a Quick Total score when the IP camera capture fails', async () => {
     vi.mocked(fetchRtspSnapshot).mockResolvedValue({
       success: false,
       error: 'Could not reach the IP camera bridge. Is it running on the local network?',
@@ -151,11 +203,33 @@ describe('Snapshot flow integration (CameraPanel -> onCreateSnapshot -> TurnHist
       ).toBeInTheDocument();
     });
 
-    // Human-confirmed fallback: the operator can still enter the score by hand.
     confirmScore('60');
 
     expect(screen.getByText('Turn #1')).toBeInTheDocument();
     expect(screen.getAllByText('After: 441').length).toBeGreaterThan(0);
+    expect(screen.queryByAltText('Turn 1 snapshot')).not.toBeInTheDocument();
+  });
+
+  it('lets the operator confirm a Per Dart turn when the IP camera capture fails', async () => {
+    vi.mocked(fetchRtspSnapshot).mockResolvedValue({
+      success: false,
+      error: 'Bridge unavailable.',
+    });
+    render(<HomePage />);
+
+    startDefaultMatch();
+    selectPerDart();
+    fireEvent.click(screen.getByRole('button', { name: /IP Camera/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Bridge unavailable.')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add BULL' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm turn' }));
+
+    expect(screen.getByText('Darts: BULL')).toBeInTheDocument();
     expect(screen.queryByAltText('Turn 1 snapshot')).not.toBeInTheDocument();
   });
 
@@ -173,7 +247,6 @@ describe('Snapshot flow integration (CameraPanel -> onCreateSnapshot -> TurnHist
       expect(screen.getByText('Bridge unreachable.')).toBeInTheDocument();
     });
 
-    // Retry the capture (same turn, no score confirmed yet).
     fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
     await waitFor(() => {
       expect(screen.getByText(/IP camera image captured for the next confirmed score\./i)).toBeInTheDocument();
@@ -183,6 +256,31 @@ describe('Snapshot flow integration (CameraPanel -> onCreateSnapshot -> TurnHist
 
     const snapshotImage = screen.getByAltText('Turn 1 snapshot') as HTMLImageElement;
     expect(snapshotImage.src).toBe('data:image/jpeg;base64,RECOVERED');
+  });
+
+  it('preserves Per Dart undo and converts total correction to Quick Total', () => {
+    render(<HomePage />);
+    startDefaultMatch();
+    selectPerDart();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Triple' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add T20' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add T20' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add T20' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm turn' }));
+
+    expect(screen.getByText('Darts: T20 · T20 · T20')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText('New score for last turn'), { target: { value: '140' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Correct score' }));
+
+    expect(screen.getByText('Last turn corrected from 180 to 140.')).toBeInTheDocument();
+    expect(screen.queryByText('Darts: T20 · T20 · T20')).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Darts:/)).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Undo last turn' }));
+    expect(screen.getByText('Last turn was undone.')).toBeInTheDocument();
+    expect(screen.queryByText('Turn #1')).not.toBeInTheDocument();
   });
 
   it('resets a finished match without reloading and starts a clean second match', () => {
@@ -195,15 +293,14 @@ describe('Snapshot flow integration (CameraPanel -> onCreateSnapshot -> TurnHist
     startDefaultMatch();
 
     fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
-    confirmScore('180'); // Alice: 301 -> 121, with snapshot.
-    confirmScore('0'); // Bob: 301 -> 301.
-    confirmScore('121'); // Alice finishes exactly on zero.
+    confirmScore('180');
+    confirmScore('0');
+    confirmScore('121');
 
     expect(screen.getByText('Game Shot')).toBeInTheDocument();
     expect(screen.getByText('Alice Wins!')).toBeInTheDocument();
     expect(screen.getByAltText('Turn 1 snapshot')).toBeInTheDocument();
 
-    // Correction and undo remain available for the winning turn.
     fireEvent.change(screen.getByPlaceholderText('New score for last turn'), { target: { value: '120' } });
     fireEvent.click(screen.getByRole('button', { name: 'Correct score' }));
     expect(screen.queryByText('Game Shot')).not.toBeInTheDocument();
@@ -214,7 +311,6 @@ describe('Snapshot flow integration (CameraPanel -> onCreateSnapshot -> TurnHist
     confirmScore('121');
     expect(screen.getByText('Alice Wins!')).toBeInTheDocument();
 
-    // Create pending UI state after the finish so reset must clear it explicitly.
     mockCapture.mockReturnValue('data:image/jpeg;base64,PENDING_AFTER_FINISH');
     fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
     expect(screen.getByText('Camera image captured for the next confirmed score.')).toBeInTheDocument();
@@ -259,5 +355,9 @@ describe('Snapshot flow integration (CameraPanel -> onCreateSnapshot -> TurnHist
     expect(screen.queryByAltText('Turn 1 snapshot')).not.toBeInTheDocument();
     expect(screen.queryByText('Alice')).not.toBeInTheDocument();
     expect(screen.queryByText('Bob')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Per Dart' }));
+    expect(screen.getByText('Live total: 0')).toBeInTheDocument();
+    expect(screen.getAllByText('Empty')).toHaveLength(3);
   });
 });

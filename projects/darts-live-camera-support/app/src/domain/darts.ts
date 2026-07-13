@@ -119,5 +119,5 @@ export function requireDartSequence(darts: PendingDartSequence): DartSequence {
     throw new Error('At least one dart is required to confirm a Per Dart turn.');
   }
 
-  return darts;
+  return darts as DartSequence;
 }

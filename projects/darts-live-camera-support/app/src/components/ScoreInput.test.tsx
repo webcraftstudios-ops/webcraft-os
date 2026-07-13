@@ -183,7 +183,7 @@ describe('ScoreInput', () => {
 
     expect(screen.getByRole('button', { name: 'Add S20' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Add MISS' })).toBeDisabled();
-    expect(screen.getAllByText('Empty')).toHaveLength(0);
+    expect(screen.queryAllByText('Empty')).toHaveLength(0);
   });
 
   it('clears hidden pending values when switching modes', () => {
@@ -198,6 +198,21 @@ describe('ScoreInput', () => {
     expect(screen.getByPlaceholderText('Turn score')).toHaveValue('');
 
     selectPerDart();
+    expect(screen.getByText('Live total: 0')).toBeInTheDocument();
+    expect(screen.getAllByText('Empty')).toHaveLength(3);
+  });
+
+  it('starts with clean pending state after unmount and remount', () => {
+    const firstRender = render(
+      <ScoreInput state={createState()} onStateChange={vi.fn()} />,
+    );
+    selectPerDart();
+    fireEvent.click(screen.getByRole('button', { name: 'Add S20' }));
+    firstRender.unmount();
+
+    render(<ScoreInput state={createState()} onStateChange={vi.fn()} />);
+    selectPerDart();
+
     expect(screen.getByText('Live total: 0')).toBeInTheDocument();
     expect(screen.getAllByText('Empty')).toHaveLength(3);
   });
