@@ -4,199 +4,153 @@
 
 Build a professional, TV-friendly darts scoring system for cafés, dart clubs, small tournaments, and pilot users.
 
-The commercial sequence is deliberate:
+The product is currently **camera-assisted and human-confirmed**. Browser and RTSP cameras provide visual evidence, but the operator remains responsible for score confirmation. Computer-vision experiments must not be presented as reliable automatic scoring.
 
-1. reliable human-confirmed scoreboard;
-2. premium demo and operator workflow;
-3. real pilot feedback;
-4. camera feasibility;
-5. only then semi-automatic recognition.
+## Current product state
 
-The project must not present mock snapshots or human confirmation as automatic visual recognition.
+Delivered on `project/darts-live-camera-support`:
 
-## Current position
+- two-player 301/501 match setup;
+- score validation, subtraction, switching, bust, and exact-zero finish;
+- turn history, correction, and undo;
+- premium responsive scoreboard and winner presentation;
+- fullscreen/kiosk support;
+- automated scoring-domain and camera-flow tests;
+- browser-camera capture;
+- local RTSP-to-JPEG bridge for a fixed IP camera;
+- snapshot-to-turn evidence linkage;
+- bridge offline/camera offline handling and recovery;
+- localhost binding, restricted CORS, and bridge-side credential isolation;
+- GitHub Actions build/test coverage and GitHub Pages demo deployment.
 
-Completed:
+Hardware acceptance for Sprint 2.7 used a physical Tapo C100. The same local Tapo Camera Account RTSP mechanism is expected on the C110, but a physical C110 test is still required before guaranteeing that exact model as a standardized commercial hardware bundle.
 
-- commercial framing and MVP definition;
-- Next.js/TypeScript/Tailwind foundation;
-- two-player 301/501 scoreboard;
-- score validation, bust, exact-zero finish, and switching;
-- history, correction, and undo;
-- mock image references;
-- Codespaces and GitHub Actions build support;
-- shared premium design foundation;
-- corrected TV scoreboard grid.
+## Experimental evidence already available
 
-Active work:
+Two standalone OpenCV spikes have been completed:
 
-- **Sprint 2.2.2.2 — Responsive TV layout & kiosk mode** via issue #25.
+1. perspective correction and coordinate-to-score mapping;
+2. before/after image subtraction and dart-candidate isolation.
 
-See `SPRINTS.md` for the detailed sprint sequence and `AGENTS.md` for the standard agent workflow.
+These prove that individual technical steps are feasible under controlled conditions. They do not yet prove:
 
-## Milestone A — Premium scoreboard demo
+- stable operation across lighting and camera angles;
+- reliable dart-tip localization;
+- multi-dart turn handling;
+- acceptable false-positive and false-negative rates;
+- calibration persistence in the application;
+- production browser performance;
+- field reliability in cafés or clubs.
 
-Goal: make the current human-confirmed product convincing and reliable for a non-technical demo.
+## Milestone A — Stabilize the pilot workflow
 
-### A1 — Design foundation
+Goal: make repeated real-world use reliable before expanding recognition scope.
 
-Status: complete.
+Potential work:
 
-Delivered:
+- reset/new-match flow after a win;
+- camera and browser-resource cleanup between matches;
+- setup documentation for non-technical operators;
+- explicit hardware support matrix;
+- failure-recovery checklist;
+- long-session and repeated-match testing.
 
-- shared visual tokens and UI primitives;
-- premium score cards;
-- obvious active-player state;
-- TV-readable score hierarchy.
-
-### A2 — Responsive TV layout & kiosk mode
-
-Status: active.
-
-Deliver:
-
-- robust desktop/16:9 layout;
-- deliberate tablet/mobile layout;
-- no horizontal overflow;
-- touch-friendly operator controls;
-- safe fullscreen enter/exit and fallback.
-
-### A3 — Motion & live-state feedback
-
-Deliver:
-
-- restrained score transitions;
-- active-player and bust feedback;
-- stable layout;
-- reduced-motion support.
-
-### A4 — Finish overlay & winner presentation
-
-Deliver:
-
-- premium winner state;
-- clear close/return behaviour;
-- responsive presentation without heavy dependencies.
-
-### A5 — Demo QA & accessibility
-
-Deliver:
-
-- contrast, focus, keyboard, and touch review;
-- long-name and edge-state testing;
-- cross-browser/fullscreen fallbacks;
-- complete regression and demo screenshots.
+Candidate issue: **#40 — Reset match flow after win**.
 
 Exit criteria:
 
-- parent premium-design issue #22 complete;
-- green build and CI;
-- desktop, TV, tablet, and mobile smoke tests pass;
-- demo can be shown without developer explanation.
+- an operator can start, complete, reset, and restart matches without refreshing;
+- scoring, correction, undo, and snapshot linkage remain reliable;
+- camera resources recover cleanly;
+- the workflow can be demonstrated without developer intervention.
 
-## Milestone B — Pilot-ready workflow
+## Milestone B — Pilot validation
 
-Goal: produce the smallest version worth testing in a real café or dart club.
+Goal: gather evidence that the system solves a meaningful operational or presentation problem.
 
-### B1 — Operator workflow & match controls
-
-Potential scope:
-
-- clearer match reset/new-leg flow;
-- practical operator navigation;
-- separation between TV view and operator actions;
-- error-recovery workflow.
-
-### B2 — Online preview deployment
-
-Potential scope:
-
-- deploy the demo to a reviewable environment;
-- document startup and demo flow;
-- keep infrastructure minimal and reversible.
-
-### B3 — Pilot validation
-
-Test with cafés, clubs, or realistic proxies.
+Test with cafés, clubs, small events, or realistic proxy users.
 
 Measure:
 
 - setup time;
+- match-start and reset friction;
 - scoring speed;
 - correction frequency;
 - readability at distance;
+- camera reliability;
 - operator confusion;
-- perceived value and willingness to test or pay.
+- perceived value;
+- willingness to pilot or pay.
 
 Exit criteria:
 
-- evidence that the scoreboard solves a meaningful problem;
-- prioritized pilot feedback;
-- explicit decision whether camera work is commercially justified.
+- at least one realistic repeated-use session;
+- prioritized operator feedback;
+- evidence for the highest-value next improvement;
+- explicit decision whether automatic score proposals are commercially justified.
 
-## Milestone C — Camera feasibility
+## Milestone C — Calibration integration
 
-Start only after Milestone B has produced positive evidence.
+Start only through an explicit scoped issue. Issue #45 is a candidate, not an automatically active sprint.
 
-### C1 — Camera feasibility spike
+Smallest acceptable integration scope:
 
-Goal: determine whether a stable camera setup can produce useful before/after images without committing to full recognition.
+- load OpenCV without blocking the application;
+- capture or select an empty-board baseline;
+- collect four perspective points;
+- preview the normalized board;
+- store and reset calibration state;
+- show clear failure and fallback states;
+- keep manual score entry fully available.
 
-Investigate:
+Before implementation, define:
 
-- browser camera access;
-- fixed mounting and framing;
-- lighting variation;
-- image capture timing;
-- privacy and storage decisions;
-- reliable human confirmation.
+- performance budget;
+- supported browsers and devices;
+- calibration lifecycle;
+- data persistence boundary;
+- acceptance images and failure cases;
+- whether this produces enough pilot value to justify maintenance cost.
 
-Output:
+## Milestone D — Assisted score proposal
 
-- smallest viable camera architecture;
-- test images and failure cases;
-- hardware assumptions;
-- risk and cost estimate;
-- go/no-go for calibration.
-
-### C2 — Board calibration
-
-Potential future scope:
-
-- board centre and rotation;
-- ring and number-segment mapping;
-- saved setup calibration;
-- lens/perspective handling.
-
-## Milestone D — Semi-automatic scoring
-
-Start only after camera capture and calibration are demonstrably reliable.
+Start only after calibration is reproducible and pilot evidence supports the investment.
 
 Potential scope:
 
 - before/after image comparison;
 - dart-candidate detection;
 - coordinate-to-segment mapping;
-- confidence score;
-- human confirmation/correction;
-- error and training-data logging.
+- confidence and uncertainty display;
+- operator confirmation or correction;
+- error logging and reproducible test fixtures.
 
-The human remains the final decision-maker until field evidence proves otherwise.
+The system must remain human-confirmed until field evidence demonstrates sufficient reliability. Never silently apply a detected score to match state.
 
 ## Milestone E — Productization
 
-Possible commercial paths:
+Choose a commercial package only after pilot evidence identifies the buyer and operating model.
+
+Possible paths:
 
 - setup and installation service;
 - hosted scoreboard subscription;
-- event/competition package;
+- event or competition package;
 - hardware bundle with camera, mount, mini-PC, and software;
-- reusable white-label operator/TV system.
+- white-label operator and TV-display system.
 
-Choose a package only after pilot evidence reveals who pays, for what outcome, and under which operating conditions.
+For a hardware bundle, validate the exact camera model, firmware behaviour, mounting assumptions, local-network setup, and support burden before making a standard recommendation.
 
-## Immediate next step
+## Immediate governance step
 
-Complete issue #25 on `feature/darts-responsive-kiosk`, validate it, publish a draft PR, and merge only after explicit user approval.
+Do not begin a new implementation automatically.
 
-Do not start motion, winner presentation, deployment, or camera work inside issue #25.
+Next:
+
+1. close completed and superseded issues where evidence supports closure;
+2. select one active issue;
+3. define its commercial purpose, smallest sellable or testable result, and non-goals;
+4. assign a dedicated branch and executing agent;
+5. define automated, manual, hardware, and security acceptance gates.
+
+For the smallest low-risk pilot improvement, assess issue #40 before starting the larger calibration integration in issue #45.
