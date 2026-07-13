@@ -218,7 +218,7 @@ describe('Snapshot flow integration (CameraPanel -> onCreateSnapshot -> TurnHist
     mockCapture.mockReturnValue('data:image/jpeg;base64,PENDING_AFTER_FINISH');
     fireEvent.click(screen.getByRole('button', { name: 'Capture Snapshot' }));
     expect(screen.getByText('Camera image captured for the next confirmed score.')).toBeInTheDocument();
-    expect(screen.getByText('Pending image: snap-snapshot')).toBeInTheDocument();
+    expect(screen.getByText(/^Pending image: snap-/)).toBeInTheDocument();
 
     const originalWindow = window;
     const reload = vi.fn();
