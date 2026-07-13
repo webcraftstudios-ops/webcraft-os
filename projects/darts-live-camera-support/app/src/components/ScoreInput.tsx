@@ -58,11 +58,17 @@ export function ScoreInput({
   const [mode, setMode] = useState<ScoreInputMode>('quick-total');
   const [scoreInput, setScoreInput] = useState('');
   const [pendingDarts, setPendingDarts] = useState<PendingDartSequence>([]);
-  const [multiplier, setMultiplier] = useState<DartMultiplier>(1);
+  const [selectedMultiplier, setSelectedMultiplier] = useState<DartMultiplier | null>(null);
   const currentPlayer = state.players.find((player) => player.id === state.match.currentPlayerId);
   const isFinished = state.match.status === 'finished';
   const isDartLimitReached = pendingDarts.length >= 3;
   const liveTotal = scoreDarts(pendingDarts);
+
+  function resetPendingInput() {
+    setScoreInput('');
+    setPendingDarts(clearDarts());
+    setSelectedMultiplier(null);
+  }
 
   function handleModeChange(nextMode: ScoreInputMode) {
     if (nextMode === mode) {
@@ -70,9 +76,7 @@ export function ScoreInput({
     }
 
     setMode(nextMode);
-    setScoreInput('');
-    setPendingDarts(clearDarts());
-    setMultiplier(1);
+    resetPendingInput();
     onMessageChange?.(null);
   }
 
@@ -113,10 +117,21 @@ export function ScoreInput({
   function addDart(dart: DartThrow) {
     try {
       setPendingDarts((current) => appendDart(current, dart));
+      setSelectedMultiplier(null);
       onMessageChange?.(null);
     } catch (error) {
       onMessageChange?.(error instanceof Error ? error.message : 'Could not add dart.');
     }
+  }
+
+  function handleRemoveLastDart() {
+    setPendingDarts((current) => removeLastDart(current));
+    setSelectedMultiplier(null);
+  }
+
+  function handleClearPendingTurn() {
+    setPendingDarts(clearDarts());
+    setSelectedMultiplier(null);
   }
 
   function handlePerDartSubmit(event: FormEvent<HTMLFormElement>) {
@@ -132,7 +147,7 @@ export function ScoreInput({
 
       publishTurn(result);
       setPendingDarts(clearDarts());
-      setMultiplier(1);
+      setSelectedMultiplier(null);
     } catch (error) {
       onMessageChange?.(error instanceof Error ? error.message : 'Could not apply darts.');
     }
@@ -204,16 +219,16 @@ export function ScoreInput({
           </div>
 
           <div>
-            <p className="mb-2 text-sm font-semibold text-[var(--dl-muted)]">Multiplier</p>
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Multiplier">
+            <p className="mb-2 text-sm font-semibold text-[var(--dl-muted)]">Choose hit type</p>
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Hit type">
               {DART_MULTIPLIERS.map((value) => (
                 <Button
-                  aria-pressed={multiplier === value}
+                  aria-pressed={selectedMultiplier === value}
                   disabled={isFinished || isDartLimitReached}
                   key={value}
-                  onClick={() => setMultiplier(value)}
+                  onClick={() => setSelectedMultiplier((current) => current === value ? null : value)}
                   type="button"
-                  variant={multiplier === value ? 'primary' : 'secondary'}
+                  variant={selectedMultiplier === value ? 'primary' : 'secondary'}
                 >
                   {MULTIPLIER_LABELS[value]}
                 </Button>
@@ -221,53 +236,64 @@ export function ScoreInput({
             </div>
           </div>
 
-          <div>
-            <p className="mb-2 text-sm font-semibold text-[var(--dl-muted)]">Board number</p>
-            <div className="grid grid-cols-5 gap-2 sm:grid-cols-10" role="group" aria-label="Board numbers">
-              {DART_NUMBERS.map((value) => (
-                <Button
-                  aria-label={`Add ${MULTIPLIER_PREFIXES[multiplier]}${value}`}
-                  className="min-h-11 px-2 py-2"
-                  disabled={isFinished || isDartLimitReached}
-                  key={value}
-                  onClick={() => addDart(createNumberedDart(value, multiplier))}
-                  type="button"
-                  variant="secondary"
-                >
-                  {value}
-                </Button>
-              ))}
+          {selectedMultiplier === null ? (
+            <p className="rounded-lg border border-dashed border-[var(--dl-border)] px-4 py-3 text-sm text-[var(--dl-muted)]">
+              Choose Single, Double or Triple to reveal board numbers 1–20.
+            </p>
+          ) : (
+            <div>
+              <p className="mb-2 text-sm font-semibold text-[var(--dl-muted)]">
+                {MULTIPLIER_LABELS[selectedMultiplier]} — choose number
+              </p>
+              <div className="grid grid-cols-5 gap-2 sm:grid-cols-10" role="group" aria-label="Board numbers">
+                {DART_NUMBERS.map((value) => (
+                  <Button
+                    aria-label={`Add ${MULTIPLIER_PREFIXES[selectedMultiplier]}${value}`}
+                    className="min-h-11 px-2 py-2"
+                    disabled={isFinished || isDartLimitReached}
+                    key={value}
+                    onClick={() => addDart(createNumberedDart(value, selectedMultiplier))}
+                    type="button"
+                    variant="secondary"
+                  >
+                    {value}
+                  </Button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="grid grid-cols-3 gap-2" role="group" aria-label="Special darts">
-            <Button
-              aria-label="Add MISS"
-              disabled={isFinished || isDartLimitReached}
-              onClick={() => addDart(MISS)}
-              type="button"
-              variant="secondary"
-            >
-              MISS
-            </Button>
-            <Button
-              aria-label="Add 25"
-              disabled={isFinished || isDartLimitReached}
-              onClick={() => addDart(OUTER_BULL)}
-              type="button"
-              variant="secondary"
-            >
-              25
-            </Button>
-            <Button
-              aria-label="Add BULL"
-              disabled={isFinished || isDartLimitReached}
-              onClick={() => addDart(BULLSEYE)}
-              type="button"
-              variant="secondary"
-            >
-              BULL 50
-            </Button>
+          <div>
+            <p className="mb-2 text-sm font-semibold text-[var(--dl-muted)]">Direct hits</p>
+            <div className="grid grid-cols-3 gap-2" role="group" aria-label="Special darts">
+              <Button
+                aria-label="Add MISS"
+                disabled={isFinished || isDartLimitReached}
+                onClick={() => addDart(MISS)}
+                type="button"
+                variant="secondary"
+              >
+                MISS
+              </Button>
+              <Button
+                aria-label="Add 25"
+                disabled={isFinished || isDartLimitReached}
+                onClick={() => addDart(OUTER_BULL)}
+                type="button"
+                variant="secondary"
+              >
+                25
+              </Button>
+              <Button
+                aria-label="Add BULL"
+                disabled={isFinished || isDartLimitReached}
+                onClick={() => addDart(BULLSEYE)}
+                type="button"
+                variant="secondary"
+              >
+                BULL 50
+              </Button>
+            </div>
           </div>
 
           <div className="flex flex-col gap-3 rounded-lg border border-[var(--dl-border)] bg-[var(--dl-bg)] p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -277,7 +303,7 @@ export function ScoreInput({
             <div className="flex flex-wrap gap-2">
               <Button
                 disabled={isFinished || pendingDarts.length === 0}
-                onClick={() => setPendingDarts((current) => removeLastDart(current))}
+                onClick={handleRemoveLastDart}
                 type="button"
                 variant="secondary"
               >
@@ -285,7 +311,7 @@ export function ScoreInput({
               </Button>
               <Button
                 disabled={isFinished || pendingDarts.length === 0}
-                onClick={() => setPendingDarts(clearDarts())}
+                onClick={handleClearPendingTurn}
                 type="button"
                 variant="secondary"
               >
