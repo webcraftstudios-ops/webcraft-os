@@ -11,6 +11,8 @@ import { Card } from '@/components/ui/Card';
 import { SectionLabel } from '@/components/ui/SectionLabel';
 import type { MatchState, Snapshot, SnapshotSource } from '@/domain/types';
 
+const DEFAULT_PENDING_SNAPSHOT_SOURCE: SnapshotSource = 'camera';
+
 export default function HomePage() {
   const [matchState, setMatchState] = useState<MatchState | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -18,7 +20,9 @@ export default function HomePage() {
   // These represent the locally taken snapshot waiting to be attached to the next score
   const [pendingSnapshotId, setPendingSnapshotId] = useState<string | null>(null);
   const [pendingSnapshotUrl, setPendingSnapshotUrl] = useState<string | null>(null);
-  const [pendingSnapshotSource, setPendingSnapshotSource] = useState<SnapshotSource>('camera');
+  const [pendingSnapshotSource, setPendingSnapshotSource] = useState<SnapshotSource>(
+    DEFAULT_PENDING_SNAPSHOT_SOURCE
+  );
   
   // Find the URL of the last confirmed turn to display in the CameraPanel
   const lastTurn = matchState?.turns.at(-1);
@@ -52,7 +56,7 @@ export default function HomePage() {
     setMessage(null);
     setPendingSnapshotId(null);
     setPendingSnapshotUrl(null);
-    setPendingSnapshotSource('camera');
+    setPendingSnapshotSource(DEFAULT_PENDING_SNAPSHOT_SOURCE);
   }
 
   function handleCaptureSnapshot(base64Url: string, source: SnapshotSource = 'camera') {
@@ -69,7 +73,7 @@ export default function HomePage() {
   function handleDiscardSnapshot() {
     setPendingSnapshotId(null);
     setPendingSnapshotUrl(null);
-    setPendingSnapshotSource('camera');
+    setPendingSnapshotSource(DEFAULT_PENDING_SNAPSHOT_SOURCE);
   }
 
   function handleStateChange(newState: MatchState) {
@@ -97,7 +101,15 @@ export default function HomePage() {
   function handleTurnConfirmed() {
     setPendingSnapshotId(null);
     setPendingSnapshotUrl(null);
-    setPendingSnapshotSource('camera');
+    setPendingSnapshotSource(DEFAULT_PENDING_SNAPSHOT_SOURCE);
+  }
+
+  function handleResetMatch() {
+    setMatchState(null);
+    setMessage(null);
+    setPendingSnapshotId(null);
+    setPendingSnapshotUrl(null);
+    setPendingSnapshotSource(DEFAULT_PENDING_SNAPSHOT_SOURCE);
   }
 
   return (
@@ -124,7 +136,7 @@ export default function HomePage() {
               </Card>
             ) : null}
 
-            <Scoreboard state={matchState} />
+            <Scoreboard state={matchState} onResetMatch={handleResetMatch} />
 
             <section className="grid gap-5 lg:grid-cols-[1fr_1fr]">
               <div className="grid gap-5">
