@@ -95,8 +95,12 @@ export function getNextPlayerId(state: MatchState): string {
   return nextPlayer.id;
 }
 
+function isPerDartTurnInput(input: ApplyTurnInput): input is ApplyPerDartTurnInput {
+  return input.entry?.mode === 'per-dart';
+}
+
 function resolveTurnInput(input: ApplyTurnInput): { score: number; entry: TurnEntry } {
-  if (input.entry?.mode === 'per-dart') {
+  if (isPerDartTurnInput(input)) {
     return {
       score: scoreDarts(input.entry.darts),
       entry: input.entry,
