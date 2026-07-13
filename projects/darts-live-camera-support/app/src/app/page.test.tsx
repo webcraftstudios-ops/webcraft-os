@@ -48,12 +48,15 @@ function selectPerDart() {
   fireEvent.click(screen.getByRole('button', { name: 'Per Dart' }));
 }
 
+function addNumberedDart(hitType: 'Single' | 'Double' | 'Triple', notation: string) {
+  fireEvent.click(screen.getByRole('button', { name: hitType }));
+  fireEvent.click(screen.getByRole('button', { name: `Add ${notation}` }));
+}
+
 function addS20T20D20() {
-  fireEvent.click(screen.getByRole('button', { name: 'Add S20' }));
-  fireEvent.click(screen.getByRole('button', { name: 'Triple' }));
-  fireEvent.click(screen.getByRole('button', { name: 'Add T20' }));
-  fireEvent.click(screen.getByRole('button', { name: 'Double' }));
-  fireEvent.click(screen.getByRole('button', { name: 'Add D20' }));
+  addNumberedDart('Single', 'S20');
+  addNumberedDart('Triple', 'T20');
+  addNumberedDart('Double', 'D20');
 }
 
 describe('Snapshot flow integration (CameraPanel -> onCreateSnapshot -> TurnHistory)', () => {
@@ -135,9 +138,8 @@ describe('Snapshot flow integration (CameraPanel -> onCreateSnapshot -> TurnHist
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'Add MISS' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Add S5' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Double' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Add D10' }));
+    addNumberedDart('Single', 'S5');
+    addNumberedDart('Double', 'D10');
     fireEvent.click(screen.getByRole('button', { name: 'Confirm turn' }));
 
     expect(screen.getByText('Darts: MISS · S5 · D10')).toBeInTheDocument();
@@ -263,10 +265,9 @@ describe('Snapshot flow integration (CameraPanel -> onCreateSnapshot -> TurnHist
     startDefaultMatch();
     selectPerDart();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Triple' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Add T20' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Add T20' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Add T20' }));
+    addNumberedDart('Triple', 'T20');
+    addNumberedDart('Triple', 'T20');
+    addNumberedDart('Triple', 'T20');
     fireEvent.click(screen.getByRole('button', { name: 'Confirm turn' }));
 
     expect(screen.getByText('Darts: T20 · T20 · T20')).toBeInTheDocument();
@@ -359,5 +360,6 @@ describe('Snapshot flow integration (CameraPanel -> onCreateSnapshot -> TurnHist
     fireEvent.click(screen.getByRole('button', { name: 'Per Dart' }));
     expect(screen.getByText('Live total: 0')).toBeInTheDocument();
     expect(screen.getAllByText('Empty')).toHaveLength(3);
+    expect(screen.queryByRole('group', { name: 'Board numbers' })).not.toBeInTheDocument();
   });
 });
