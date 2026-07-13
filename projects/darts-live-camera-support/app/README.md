@@ -204,3 +204,23 @@ Do not add yet:
 - tournament brackets.
 
 The priority is a working, demoable scoreboard prototype.
+
+## IP camera (Tapo C110) setup — Sprint 2.7
+
+The Camera Panel supports two capture sources: the browser's own webcam
+(existing `getUserMedia` flow) and a real IP camera such as the TP-Link
+Tapo C110, via a small local bridge process. See
+[`tools/rtsp-snapshot-bridge/README.md`](../tools/rtsp-snapshot-bridge/README.md)
+for how to run the bridge next to the camera.
+
+1. Set up the Tapo C110's local RTSP "Camera Account" in the Tapo app.
+2. Run the bridge (`tools/rtsp-snapshot-bridge`) with that camera's RTSP URL.
+3. Copy `.env.example` to `.env` in this folder and set
+   `NEXT_PUBLIC_TAPO_BRIDGE_URL` to the bridge's local address
+   (e.g. `http://localhost:8089`).
+4. In the Camera Panel, switch to "IP Camera (Tapo C110)" and press
+   "Capture Snapshot" to pull a fresh frame.
+
+This only adds a hardware capture source. No automatic score detection runs
+on this feed as part of this sprint — the operator still confirms every
+score manually, per the project's human-confirmed workflow.
