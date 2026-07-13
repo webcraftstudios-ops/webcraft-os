@@ -1,152 +1,128 @@
 # Sprints — Darts Live Camera Support
 
-## Fase 0 — Projectkader omgezet naar sprints
+## Current status
 
-Doel van fase 0: het project scherp genoeg maken om te bouwen zonder te verzanden in een te groot computer-vision R&D-traject.
+Integration branch:
 
-Fase 0 bestaat uit vier korte sprints. Elke sprint levert een concreet beslisdocument of bouwklaar artefact op.
+```text
+project/darts-live-camera-support
+```
 
----
+Current product mode:
 
-## Sprint 0.1 — Commerciële scope
+- two-player 301/501;
+- human-confirmed scoring;
+- browser-camera and local RTSP snapshot capture;
+- snapshot-to-turn history linkage;
+- premium TV-friendly presentation;
+- automatic recognition not integrated into the production application.
 
-### Doel
+There is currently **no automatically authorized implementation sprint**. The next issue must be selected explicitly after governance and product review.
 
-Bepalen voor wie de eerste versie bedoeld is en waarom die doelgroep zou betalen.
+## Completed work
 
-### Kernvraag
+### Phase 0 — Commercial and technical framing
 
-Voor wie is dit probleem urgent genoeg om een eerste versie te testen of te betalen?
+Completed:
 
-### Taken
+- target users and problem framing;
+- MVP and explicit non-goals;
+- Next.js/TypeScript/Tailwind direction;
+- human-confirmed camera-assisted workflow;
+- demo and validation plan.
 
-- Kies primaire doelgroep: dartclub, café, tornooiorganisator of recreatieve spelers.
-- Beschrijf het huidige probleem: scorefouten, traag scoreverloop, weinig overzicht, geen historiek, geen professionele schermweergave.
-- Bepaal betaalreden: tijdswinst, minder discussie, betere tornooi-ervaring, professionelere clubavond, betere stream/overlay.
-- Kies eerste commerciële belofte.
-- Bepaal wat níét beloofd wordt in MVP.
+### Phase 1 — Core scoreboard
 
-### Output
+Completed:
 
-- Doelgroepkeuze
-- Probleemdefinitie
-- Eerste pitchzin
-- Betaalhypothese
+- match setup for two players;
+- 301/501 selection;
+- score validation and subtraction;
+- player switching;
+- bust and exact-zero finish;
+- turn history;
+- correction and undo.
 
-### Definition of Done
+### Premium demo and operator foundation
 
-Sprint is klaar wanneer één primaire doelgroep is gekozen en er een korte pitch bestaat die getest kan worden bij een echte club of café.
+| Work | Status | GitHub reference | Result |
+|---|---|---|---|
+| Design foundation | Completed | PR #24 | Shared tokens, UI primitives, premium TV-readable layout |
+| Responsive TV layout and kiosk mode | Completed | Issue #25, PR #27 | Desktop/TV layout, mobile stacking, fullscreen support |
+| GitHub Pages demo deployment | Completed | PR #28 | Static demo deployment workflow |
+| Premium visual design and winner overlay | Completed | Issue #22, PR #31 | Active-player treatment and finished-match presentation |
+| Scoring-domain tests | Completed | Issue #32, PR #33 | Automated coverage for validation, bust, finish, correction, and undo |
+| Match setup and configuration | Completed | Issue #36, PR #37 | Player names and 301/501 setup flow |
 
----
+### Camera-assisted workflow
 
-## Sprint 0.2 — MVP-scope
+| Work | Status | GitHub reference | Result |
+|---|---|---|---|
+| Mock camera preview and linkage | Completed | Issue #34, PR #35 | Snapshot evidence linked to turns |
+| Browser camera capture | Completed | Issue #38, PR #39 | `getUserMedia` snapshot capture |
+| Real IP camera via RTSP bridge | Completed | Issue #46, PR #47 | Local ffmpeg bridge, C100 hardware acceptance, error recovery, credential isolation |
 
-### Doel
+Sprint 2.7 was accepted with an explicit hardware waiver: the physical end-to-end test used a Tapo C100 using the same local Tapo RTSP mechanism. A physical C110 test remains advisable before guaranteeing the C110 as bundled pilot hardware, but it is not an open software-sprint blocker.
 
-De kleinste nuttige versie vastleggen die demo- en testbaar is zonder perfecte AI-detectie.
+### Computer-vision feasibility spikes
 
-### Kernvraag
+| Work | Status | GitHub reference | Evidence level |
+|---|---|---|---|
+| Perspective correction and coordinate-to-score mapping | Spike completed | PR #42 | Feasibility demonstrated with controlled image input |
+| Image subtraction and dart candidate isolation | Spike completed | PR #44 | Feasibility demonstrated with test images |
 
-Wat moet de eerste demo absoluut kunnen om geloofwaardig te zijn?
+These spikes are not production automatic recognition. They do not authorize integration into the main application without a new issue, architecture review, failure criteria, and human-confirmation safeguards.
 
-### Taken
+## Current governance gate
 
-- Splits functies in must-have, should-have en later.
-- Bevestig dat automatische dartdetectie niet verplicht is voor versie 1.
-- Leg de hybride flow vast: score invoeren, camera snapshot koppelen, mens bevestigt/corrigeert.
-- Bepaal demo-scenario: 501-leg tussen twee spelers.
-- Bepaal minimale UI-schermen.
+Before starting more implementation:
 
-### Output
+1. confirm that existing open issues still match the current product state;
+2. choose one issue as the next commercial or operational priority;
+3. define the smallest testable scope and explicit non-goals;
+4. assign one branch and one executing agent;
+5. define automated, manual, hardware, and security checks before editing.
 
-- MVP-functielijst
-- Demo-scenario
-- Niet-bouwen-lijst
-- Eerste user flow
+## Candidate next issues
 
-### Definition of Done
+### Issue #40 — Reset match flow after win
 
-Sprint is klaar wanneer een ontwikkelaar exact weet wat in de eerste prototypeversie moet zitten en wat bewust wordt uitgesteld.
+Type: small pilot-readiness improvement.
 
----
+Potential value:
 
-## Sprint 0.3 — Technische projectkeuze
+- removes the need to refresh after a completed match;
+- improves café/club demo continuity;
+- keeps camera cleanup and undo behaviour explicit.
 
-### Doel
+This is the smaller and lower-risk implementation candidate.
 
-Een technische basis kiezen die snel bouwbaar is en later camera/computer vision kan dragen.
+### Issue #45 — OpenCV setup and calibration UI
 
-### Kernvraag
+Type: larger experimental integration.
 
-Welke stack maakt de snelste demo mogelijk zonder de latere AI-route te blokkeren?
+Required before start:
 
-### Taken
+- confirm that calibration integration is commercially justified now;
+- separate spike code from production architecture;
+- define browser performance and asset-loading constraints;
+- define calibration persistence and reset behaviour;
+- preserve manual scoring as the final decision path;
+- add explicit failure and fallback criteria.
 
-- Kies frontend stack.
-- Kies backend/API-aanpak.
-- Kies opslag voor matchdata en snapshots.
-- Bepaal of prototype lokaal, webgebaseerd of hosted wordt.
-- Bepaal camera-aanpak voor fase 1: mock image, file upload of browser camera.
-- Leg latere computer-vision route vast: OpenCV, verschilbeeld, segment mapping, confidence score.
+Do not start issue #45 merely because the feasibility spikes succeeded.
 
-### Output
+## Standard execution flow
 
-- Technische stackbeslissing
-- Architectuurschets
-- Datamodel v0
-- Camera-aanpak fase 1
+```text
+issue selection and acceptance criteria
+→ orientation and branch safety
+→ scoped implementation
+→ issue-specific specialist review
+→ automated and manual regression QA
+→ APPROVE FOR PR or CHANGES REQUIRED
+→ draft PR
+→ explicit human merge approval
+```
 
-### Definition of Done
-
-Sprint is klaar wanneer de eerste technische bouwrichting vastligt en geen fundamentele keuzes meer openstaan voor het scoreboard prototype.
-
----
-
-## Sprint 0.4 — Demo- en validatieplan
-
-### Doel
-
-Bepalen hoe de eerste demo getest wordt bij echte gebruikers of kopers.
-
-### Kernvraag
-
-Hoe krijgen we zo snel mogelijk bewijs dat dit nuttig of verkoopbaar is?
-
-### Taken
-
-- Maak een demo-script van maximaal 2 minuten.
-- Maak vijf validatievragen voor clubs/cafés.
-- Bepaal welke feedback gemeten wordt.
-- Bepaal eerste prijs-/pakkettest.
-- Maak lijst van 5 mogelijke testlocaties of profielen.
-
-### Output
-
-- Demo-script
-- Validatievragen
-- Feedbackcriteria
-- Eerste prijs-/pakketopties
-
-### Definition of Done
-
-Sprint is klaar wanneer het prototype niet alleen gebouwd kan worden, maar ook getest kan worden bij een echte doelgroep.
-
----
-
-## Sprintvolgorde
-
-1. Sprint 0.1 — Commerciële scope
-2. Sprint 0.2 — MVP-scope
-3. Sprint 0.3 — Technische projectkeuze
-4. Sprint 0.4 — Demo- en validatieplan
-
-## Fase 0 eindbeslissing
-
-Na deze vier sprints moet beslist worden:
-
-- primaire doelgroep;
-- exacte MVP-scope;
-- technische stack;
-- eerste demo-flow;
-- wat expliciet niet gebouwd wordt;
-- of het project doorgaat naar Fase 1: Scoreboard Prototype.
+Project-specific rules are defined in `AGENTS.md`. One active issue and one feature branch remain the default unit of work.

@@ -1,197 +1,156 @@
 # Roadmap — Darts Live Camera Support
 
-## Fase 0 — Projectkader als sprints
+## Product direction
 
-Doel: voorkomen dat dit een te groot R&D-project wordt.
+Build a professional, TV-friendly darts scoring system for cafés, dart clubs, small tournaments, and pilot users.
 
-Fase 0 is omgezet naar vier korte sprints. Zie ook `SPRINTS.md`.
+The product is currently **camera-assisted and human-confirmed**. Browser and RTSP cameras provide visual evidence, but the operator remains responsible for score confirmation. Computer-vision experiments must not be presented as reliable automatic scoring.
 
-### Sprint 0.1 — Commerciële scope
+## Current product state
 
-Doel: bepalen voor wie de eerste versie bedoeld is en waarom die doelgroep zou betalen.
+Delivered on `project/darts-live-camera-support`:
 
-Output:
+- two-player 301/501 match setup;
+- score validation, subtraction, switching, bust, and exact-zero finish;
+- turn history, correction, and undo;
+- premium responsive scoreboard and winner presentation;
+- fullscreen/kiosk support;
+- automated scoring-domain and camera-flow tests;
+- browser-camera capture;
+- local RTSP-to-JPEG bridge for a fixed IP camera;
+- snapshot-to-turn evidence linkage;
+- bridge offline/camera offline handling and recovery;
+- localhost binding, restricted CORS, and bridge-side credential isolation;
+- GitHub Actions build/test coverage and GitHub Pages demo deployment.
 
-- primaire doelgroep;
-- probleemdefinitie;
-- eerste pitchzin;
-- betaalhypothese.
+Hardware acceptance for Sprint 2.7 used a physical Tapo C100. The same local Tapo Camera Account RTSP mechanism is expected on the C110, but a physical C110 test is still required before guaranteeing that exact model as a standardized commercial hardware bundle.
 
-### Sprint 0.2 — MVP-scope
+## Experimental evidence already available
 
-Doel: vastleggen wat de eerste demo absoluut moet kunnen zonder afhankelijk te zijn van perfecte AI-detectie.
+Two standalone OpenCV spikes have been completed:
 
-Output:
+1. perspective correction and coordinate-to-score mapping;
+2. before/after image subtraction and dart-candidate isolation.
 
-- MVP-functielijst;
-- demo-scenario;
-- niet-bouwen-lijst;
-- eerste user flow.
+These prove that individual technical steps are feasible under controlled conditions. They do not yet prove:
 
-### Sprint 0.3 — Technische projectkeuze
+- stable operation across lighting and camera angles;
+- reliable dart-tip localization;
+- multi-dart turn handling;
+- acceptable false-positive and false-negative rates;
+- calibration persistence in the application;
+- production browser performance;
+- field reliability in cafés or clubs.
 
-Doel: technische basis kiezen die snel bouwbaar is en later camera/computer vision kan dragen.
+## Milestone A — Stabilize the pilot workflow
 
-Output:
+Goal: make repeated real-world use reliable before expanding recognition scope.
 
-- stackbeslissing;
-- architectuurschets;
-- datamodel v0;
-- camera-aanpak fase 1.
+Potential work:
 
-### Sprint 0.4 — Demo- en validatieplan
+- reset/new-match flow after a win;
+- camera and browser-resource cleanup between matches;
+- setup documentation for non-technical operators;
+- explicit hardware support matrix;
+- failure-recovery checklist;
+- long-session and repeated-match testing.
 
-Doel: bepalen hoe de eerste demo getest wordt bij echte gebruikers of kopers.
+Candidate issue: **#40 — Reset match flow after win**.
 
-Output:
+Exit criteria:
 
-- demo-script;
-- validatievragen;
-- feedbackcriteria;
-- eerste prijs-/pakketopties.
+- an operator can start, complete, reset, and restart matches without refreshing;
+- scoring, correction, undo, and snapshot linkage remain reliable;
+- camera resources recover cleanly;
+- the workflow can be demonstrated without developer intervention.
 
-### Fase 0 exitcriteria
+## Milestone B — Pilot validation
 
-Fase 0 is klaar wanneer volgende beslissingen genomen zijn:
+Goal: gather evidence that the system solves a meaningful operational or presentation problem.
 
-- primaire doelgroep;
-- exacte MVP-scope;
-- technische stack;
-- eerste demo-flow;
-- expliciete niet-bouwen-lijst;
-- go/no-go naar Fase 1: Scoreboard Prototype.
+Test with cafés, clubs, small events, or realistic proxy users.
 
-## Fase 1 — Scoreboard Prototype
+Measure:
 
-Doel: dartswedstrijd kunnen spelen zonder camera.
+- setup time;
+- match-start and reset friction;
+- scoring speed;
+- correction frequency;
+- readability at distance;
+- camera reliability;
+- operator confusion;
+- perceived value;
+- willingness to pilot or pay.
 
-Functies:
+Exit criteria:
 
-- 501/301 match starten;
-- spelers toevoegen;
-- beurtinvoer;
-- score aftrekken;
-- bust-regels;
-- winconditie;
-- beurtgeschiedenis;
-- scorecorrectie.
+- at least one realistic repeated-use session;
+- prioritized operator feedback;
+- evidence for the highest-value next improvement;
+- explicit decision whether automatic score proposals are commercially justified.
 
-Waarom commercieel belangrijk:
+## Milestone C — Calibration integration
 
-Dit is al bruikbaar als live scorebord voor cafés, clubs of streams.
+Start only through an explicit scoped issue. Issue #45 is a candidate, not an automatically active sprint.
 
-## Fase 2 — Camera Snapshot Support
+Smallest acceptable integration scope:
 
-Doel: camera toevoegen zonder automatische scoreherkenning als blocker.
+- load OpenCV without blocking the application;
+- capture or select an empty-board baseline;
+- collect four perspective points;
+- preview the normalized board;
+- store and reset calibration state;
+- show clear failure and fallback states;
+- keep manual score entry fully available.
 
-Functies:
+Before implementation, define:
 
-- snapshot nemen na beurt;
-- snapshot koppelen aan turn;
-- snapshot preview tonen;
-- score manueel bevestigen;
-- trainingsdata opslaan.
+- performance budget;
+- supported browsers and devices;
+- calibration lifecycle;
+- data persistence boundary;
+- acceptance images and failure cases;
+- whether this produces enough pilot value to justify maintenance cost.
 
-Waarom commercieel belangrijk:
+## Milestone D — Assisted score proposal
 
-Dit maakt het product onderscheidend en bouwt data op voor latere computer vision.
+Start only after calibration is reproducible and pilot evidence supports the investment.
 
-## Fase 3 — Demo UI
+Potential scope:
 
-Doel: demo toonbaar maken aan niet-technische gebruikers.
+- before/after image comparison;
+- dart-candidate detection;
+- coordinate-to-segment mapping;
+- confidence and uncertainty display;
+- operator confirmation or correction;
+- error logging and reproducible test fixtures.
 
-Functies:
+The system must remain human-confirmed until field evidence demonstrates sufficient reliability. Never silently apply a detected score to match state.
 
-- grote scoreweergave;
-- huidige speler duidelijk tonen;
-- laatste 3 beurten;
-- correctieknop;
-- camera paneel;
-- eenvoudige full-screen mode.
+## Milestone E — Productization
 
-Waarom commercieel belangrijk:
+Choose a commercial package only after pilot evidence identifies the buyer and operating model.
 
-Een café of club moet binnen enkele minuten begrijpen wat het oplevert.
+Possible paths:
 
-## Fase 4 — Bordkalibratie
+- setup and installation service;
+- hosted scoreboard subscription;
+- event or competition package;
+- hardware bundle with camera, mount, mini-PC, and software;
+- white-label operator and TV-display system.
 
-Doel: dartbord geometrisch herkennen.
+For a hardware bundle, validate the exact camera model, firmware behaviour, mounting assumptions, local-network setup, and support burden before making a standard recommendation.
 
-Functies:
+## Immediate governance step
 
-- bordcentrum aanduiden;
-- rotatie bepalen;
-- ringzones mappen;
-- nummersegmenten mappen;
-- kalibratie opslaan per setup.
+Do not begin a new implementation automatically.
 
-Risico:
+Next:
 
-Belichting, hoek, lensvervorming en bordvariatie kunnen herkenning verstoren.
+1. close completed and superseded issues where evidence supports closure;
+2. select one active issue;
+3. define its commercial purpose, smallest sellable or testable result, and non-goals;
+4. assign a dedicated branch and executing agent;
+5. define automated, manual, hardware, and security acceptance gates.
 
-## Fase 5 — Semi-automatische scoring
-
-Doel: scorevoorstel genereren, maar mens blijft eindbeslisser.
-
-Functies:
-
-- verschilbeeld voor/na beurt;
-- dartkandidaten detecteren;
-- coördinaten mappen naar segment;
-- confidence score tonen;
-- scorevoorstel bevestigen/corrigeren.
-
-Waarom commercieel belangrijk:
-
-Dit is de eerste echte AI-belofte zonder te doen alsof het foutloos is.
-
-## Fase 6 — Producttest
-
-Doel: testen in realistische omgeving.
-
-Testlocaties:
-
-- lokale dartclub;
-- café met dartbord;
-- thuissituatie met vaste camera.
-
-Meten:
-
-- tijd om setup te doen;
-- aantal correcties;
-- herkenningskwaliteit;
-- gebruiksgemak;
-- bereidheid om te betalen.
-
-## Fase 7 — Productisering
-
-Mogelijke pakketten:
-
-### Setup service
-
-Eenmalige installatie voor café of club.
-
-### SaaS dashboard
-
-Maandelijks abonnement voor scoring, historiek en statistieken.
-
-### Tornooi pakket
-
-Per event betalen voor scoreboard, camera support en schermweergave.
-
-### Hardware bundel
-
-Camera, mount, mini-pc en software als pakket.
-
-## Eerstvolgende bouwstap
-
-Rond Fase 0 af via de vier sprints. Ga pas daarna naar de simpele webapp met:
-
-- twee spelers;
-- 501 scorelogica;
-- score input;
-- beurtgeschiedenis;
-- correctieknop;
-- mock camera snapshot paneel.
-
-Pas daarna echte camera-integratie toevoegen.
+For the smallest low-risk pilot improvement, assess issue #40 before starting the larger calibration integration in issue #45.
