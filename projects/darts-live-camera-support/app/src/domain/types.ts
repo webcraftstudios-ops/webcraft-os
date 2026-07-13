@@ -2,7 +2,7 @@ export type GameType = '301' | '501';
 
 export type MatchStatus = 'setup' | 'active' | 'finished';
 
-export type SnapshotSource = 'mock' | 'upload' | 'camera';
+export type SnapshotSource = 'mock' | 'upload' | 'camera' | 'rtsp';
 
 export type Player = {
   id: string;

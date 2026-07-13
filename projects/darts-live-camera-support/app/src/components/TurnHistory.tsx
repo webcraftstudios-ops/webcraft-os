@@ -36,12 +36,27 @@ export function TurnHistory({ state }: TurnHistoryProps) {
                   </div>
                 </div>
 
-                <div className="mt-4 grid gap-3 text-sm text-[var(--dl-muted)] md:grid-cols-4">
+                <div className="mt-4 grid gap-3 text-sm text-[var(--dl-muted)] md:grid-cols-3">
                   <p>Before: {turn.scoreBefore}</p>
                   <p>After: {turn.scoreAfter}</p>
                   <p>Status: {turn.isBust ? 'Bust' : 'Valid'}</p>
-                  <p>Image: {turn.snapshotId ?? '-'}</p>
                 </div>
+                
+                {turn.snapshotId && (
+                  <div className="mt-4 border-t border-[var(--dl-border)] pt-4">
+                    <p className="mb-2 text-xs uppercase tracking-wider text-[var(--dl-muted)]">Snapshot</p>
+                    {(() => {
+                      const snap = state.snapshots.find(s => s.id === turn.snapshotId);
+                      return snap ? (
+                        <div className="relative h-24 w-40 overflow-hidden rounded-md border border-[var(--dl-border)]">
+                          <img src={snap.url} alt={`Turn ${turn.turnNumber} snapshot`} className="h-full w-full object-cover" />
+                        </div>
+                      ) : (
+                        <p className="text-xs font-mono">{turn.snapshotId}</p>
+                      );
+                    })()}
+                  </div>
+                )}
               </article>
             );
           })}
