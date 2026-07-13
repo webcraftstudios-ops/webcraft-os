@@ -1,16 +1,32 @@
-import type { Correction, MatchState, PlayerScore, Turn } from './types';
+import { scoreDarts } from './darts';
+import type { DartSequence } from './darts';
+import type { Correction, MatchState, PlayerScore, Turn, TurnEntry } from './types';
 
 export type ScoreValidationResult = {
   valid: boolean;
   reason?: string;
 };
 
-export type ApplyTurnInput = {
+type ApplyTurnCommon = {
   state: MatchState;
-  score: number;
   snapshotId?: string;
   now?: string;
 };
+
+export type ApplyQuickTotalTurnInput = ApplyTurnCommon & {
+  score: number;
+  entry?: Readonly<{ mode: 'quick-total' }>;
+};
+
+export type ApplyPerDartTurnInput = ApplyTurnCommon & {
+  entry: Readonly<{
+    mode: 'per-dart';
+    darts: DartSequence;
+  }>;
+  score?: never;
+};
+
+export type ApplyTurnInput = ApplyQuickTotalTurnInput | ApplyPerDartTurnInput;
 
 export type ApplyTurnResult = {
   state: MatchState;
@@ -79,8 +95,27 @@ export function getNextPlayerId(state: MatchState): string {
   return nextPlayer.id;
 }
 
+function isPerDartTurnInput(input: ApplyTurnInput): input is ApplyPerDartTurnInput {
+  return input.entry?.mode === 'per-dart';
+}
+
+function resolveTurnInput(input: ApplyTurnInput): { score: number; entry: TurnEntry } {
+  if (isPerDartTurnInput(input)) {
+    return {
+      score: scoreDarts(input.entry.darts),
+      entry: input.entry,
+    };
+  }
+
+  return {
+    score: input.score,
+    entry: { mode: 'quick-total' },
+  };
+}
+
 export function applyTurn(input: ApplyTurnInput): ApplyTurnResult {
-  const validation = validateTurnScore(input.score);
+  const { score, entry } = resolveTurnInput(input);
+  const validation = validateTurnScore(score);
 
   if (!validation.valid) {
     throw new Error(validation.reason ?? 'Invalid score.');
@@ -93,7 +128,7 @@ export function applyTurn(input: ApplyTurnInput): ApplyTurnResult {
   const now = input.now ?? new Date().toISOString();
   const currentPlayerScore = getCurrentPlayerScore(input.state);
   const scoreBefore = currentPlayerScore.remainingScore;
-  const rawScoreAfter = scoreBefore - input.score;
+  const rawScoreAfter = scoreBefore - score;
   const isBust = rawScoreAfter < 0;
   const isFinished = rawScoreAfter === 0;
   const scoreAfter = isBust ? scoreBefore : rawScoreAfter;
@@ -103,11 +138,12 @@ export function applyTurn(input: ApplyTurnInput): ApplyTurnResult {
     matchId: input.state.match.id,
     playerId: input.state.match.currentPlayerId,
     turnNumber: input.state.turns.length + 1,
-    enteredScore: input.score,
-    confirmedScore: input.score,
+    enteredScore: score,
+    confirmedScore: score,
     scoreBefore,
     scoreAfter,
     isBust,
+    entry,
     snapshotId: input.snapshotId,
     createdAt: now,
   };
