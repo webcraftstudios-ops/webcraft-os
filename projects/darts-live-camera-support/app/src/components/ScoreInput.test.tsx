@@ -53,6 +53,12 @@ function addNumberedDart(hitType: 'Single' | 'Double' | 'Triple', notation: stri
   fireEvent.click(screen.getByRole('button', { name: `Add ${notation}` }));
 }
 
+function expectThreeDartSlots() {
+  expect(screen.getByTestId('dart-position-1')).toBeInTheDocument();
+  expect(screen.getByTestId('dart-position-2')).toBeInTheDocument();
+  expect(screen.getByTestId('dart-position-3')).toBeInTheDocument();
+}
+
 describe('ScoreInput', () => {
   it('switches between Quick Total and Per Dart', () => {
     renderInput();
@@ -81,63 +87,142 @@ describe('ScoreInput', () => {
     expect(nextState.turns[0].entry).toEqual({ mode: 'quick-total' });
   });
 
-  it('reveals numbers only after the operator chooses Single, Double or Triple', () => {
+  it('shows only hit-type choices and direct hits at the start of a Per Dart turn', () => {
     renderInput();
     selectPerDart();
 
-    expect(screen.getByText(/choose single, double or triple to reveal board numbers/i)).toBeInTheDocument();
+    expect(screen.getByText('Dart 1 of 3')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Single' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Double' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Triple' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add MISS' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add 25' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add BULL' })).toBeInTheDocument();
     expect(screen.queryByRole('group', { name: 'Board numbers' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Add S20' })).not.toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Double' }));
-
-    expect(screen.getByRole('group', { name: 'Board numbers' })).toBeInTheDocument();
-    for (let value = 1; value <= 20; value += 1) {
-      expect(screen.getByRole('button', { name: `Add D${value}` })).toBeInTheDocument();
-    }
-
-    fireEvent.click(screen.getByRole('button', { name: 'Add D20' }));
-
-    expect(screen.getByTestId('dart-position-1')).toHaveTextContent('D20');
-    expect(screen.getByText('Live total: 40')).toBeInTheDocument();
-    expect(screen.queryByRole('group', { name: 'Board numbers' })).not.toBeInTheDocument();
-    expect(screen.getByText(/choose single, double or triple to reveal board numbers/i)).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Triple' }));
-    expect(screen.getByRole('button', { name: 'Add T20' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument();
+    expectThreeDartSlots();
+    expect(screen.getByText('Live total: 0')).toBeInTheDocument();
   });
 
-  it('supports direct MISS, 25 and BULL actions without revealing number controls', () => {
+  it.each([
+    { hitType: 'Single' as const, prefix: 'S' },
+    { hitType: 'Double' as const, prefix: 'D' },
+    { hitType: 'Triple' as const, prefix: 'T' },
+  ])('shows only the $hitType number-selection screen after choosing the hit type', ({ hitType, prefix }) => {
+    renderInput();
+    selectPerDart();
+
+    fireEvent.click(screen.getByRole('button', { name: hitType }));
+
+    expect(screen.getByText(`Dart 1 of 3 — ${hitType}`)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Board numbers' })).toBeInTheDocument();
+    for (let value = 1; value <= 20; value += 1) {
+      expect(screen.getByRole('button', { name: `Add ${prefix}${value}` })).toBeInTheDocument();
+    }
+
+    expect(screen.queryByRole('button', { name: 'Single' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Double' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Triple' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Add MISS' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Add 25' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Add BULL' })).not.toBeInTheDocument();
+    expectThreeDartSlots();
+    expect(screen.getByText('Live total: 0')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Remove last dart' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Reset turn' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Confirm turn' })).toBeInTheDocument();
+  });
+
+  it('uses Back to return to hit-type choice without adding a dart', () => {
+    renderInput();
+    selectPerDart();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Triple' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+
+    expect(screen.getByText('Dart 1 of 3')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Triple' })).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Board numbers' })).not.toBeInTheDocument();
+    expect(screen.getAllByText('Empty')).toHaveLength(3);
+    expect(screen.getByText('Live total: 0')).toBeInTheDocument();
+  });
+
+  it('adds MISS, 25 and BULL directly and remains on hit-type choice', () => {
     renderInput();
     selectPerDart();
 
     fireEvent.click(screen.getByRole('button', { name: 'Add MISS' }));
+    expect(screen.getByText('Dart 2 of 3')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Add 25' }));
+    expect(screen.getByText('Dart 3 of 3')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Add BULL' }));
 
     expect(screen.getByText('Live total: 75')).toBeInTheDocument();
     expect(screen.getByTestId('dart-position-1')).toHaveTextContent('MISS');
     expect(screen.getByTestId('dart-position-2')).toHaveTextContent('25');
     expect(screen.getByTestId('dart-position-3')).toHaveTextContent('BULL');
+    expect(screen.getByText('Three darts entered')).toBeInTheDocument();
     expect(screen.queryByRole('group', { name: 'Board numbers' })).not.toBeInTheDocument();
   });
 
-  it('removes the last dart and clears the complete pending sequence', () => {
+  it.each([
+    { hitType: 'Single' as const, notation: 'S20', total: 20 },
+    { hitType: 'Double' as const, notation: 'D20', total: 40 },
+    { hitType: 'Triple' as const, notation: 'T20', total: 60 },
+  ])('adds the correct $notation dart and returns automatically to hit-type choice', ({ hitType, notation, total }) => {
     renderInput();
     selectPerDart();
 
+    addNumberedDart(hitType, notation);
+
+    expect(screen.getByTestId('dart-position-1')).toHaveTextContent(notation);
+    expect(screen.getByText(`Live total: ${total}`)).toBeInTheDocument();
+    expect(screen.getByText('Dart 2 of 3')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Single' })).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Board numbers' })).not.toBeInTheDocument();
+  });
+
+  it('removes the last dart from hit-type choice', () => {
+    renderInput();
+    selectPerDart();
     addNumberedDart('Single', 'S20');
     addNumberedDart('Single', 'S5');
-    expect(screen.getByText('Live total: 25')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Remove last dart' }));
+
     expect(screen.getByText('Live total: 20')).toBeInTheDocument();
     expect(screen.getByTestId('dart-position-2')).toHaveTextContent('Empty');
-    expect(screen.queryByRole('group', { name: 'Board numbers' })).not.toBeInTheDocument();
+    expect(screen.getByText('Dart 2 of 3')).toBeInTheDocument();
+  });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Clear pending turn' }));
+  it('removes the last dart from number selection and returns to hit-type choice', () => {
+    renderInput();
+    selectPerDart();
+    addNumberedDart('Single', 'S20');
+    addNumberedDart('Double', 'D10');
+    fireEvent.click(screen.getByRole('button', { name: 'Triple' }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Remove last dart' }));
+
+    expect(screen.getByText('Live total: 20')).toBeInTheDocument();
+    expect(screen.getByTestId('dart-position-2')).toHaveTextContent('Empty');
+    expect(screen.getByText('Dart 2 of 3')).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Board numbers' })).not.toBeInTheDocument();
+  });
+
+  it('resets the pending turn from number selection and returns to hit-type choice', () => {
+    renderInput();
+    selectPerDart();
+    addNumberedDart('Single', 'S20');
+    fireEvent.click(screen.getByRole('button', { name: 'Triple' }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reset turn' }));
+
     expect(screen.getByText('Live total: 0')).toBeInTheDocument();
     expect(screen.getAllByText('Empty')).toHaveLength(3);
+    expect(screen.getByText('Dart 1 of 3')).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Board numbers' })).not.toBeInTheDocument();
   });
 
   it.each([
@@ -166,7 +251,7 @@ describe('ScoreInput', () => {
       total: 120,
       dartCount: 3,
     },
-  ])('confirms a $name turn', ({ add, total, dartCount }) => {
+  ])('confirms a $name turn and resets the next operator step', ({ add, total, dartCount }) => {
     const { onStateChange, onTurnConfirmed } = renderInput();
     selectPerDart();
     add();
@@ -181,9 +266,12 @@ describe('ScoreInput', () => {
       expect(turn.entry.darts).toHaveLength(dartCount);
     }
     expect(onTurnConfirmed).toHaveBeenCalledTimes(1);
+    expect(screen.getAllByText('Empty')).toHaveLength(3);
+    expect(screen.getByText('Dart 1 of 3')).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Board numbers' })).not.toBeInTheDocument();
   });
 
-  it('prevents empty confirmation and a fourth dart', () => {
+  it('prevents empty confirmation and blocks further input after the third dart', () => {
     renderInput();
     selectPerDart();
 
@@ -197,10 +285,13 @@ describe('ScoreInput', () => {
     expect(screen.getByRole('button', { name: 'Double' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Triple' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Add MISS' })).toBeDisabled();
-    expect(screen.queryAllByText('Empty')).toHaveLength(0);
+    expect(screen.getByRole('button', { name: 'Add 25' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Add BULL' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Confirm turn' })).toBeEnabled();
+    expect(screen.queryByRole('group', { name: 'Board numbers' })).not.toBeInTheDocument();
   });
 
-  it('clears hidden pending values and selected hit type when switching modes', () => {
+  it('clears pending darts and the temporary number-selection step when switching modes', () => {
     renderInput();
 
     fireEvent.change(screen.getByPlaceholderText('Turn score'), { target: { value: '60' } });
@@ -215,6 +306,7 @@ describe('ScoreInput', () => {
     selectPerDart();
     expect(screen.getByText('Live total: 0')).toBeInTheDocument();
     expect(screen.getAllByText('Empty')).toHaveLength(3);
+    expect(screen.getByText('Dart 1 of 3')).toBeInTheDocument();
     expect(screen.queryByRole('group', { name: 'Board numbers' })).not.toBeInTheDocument();
   });
 
@@ -224,6 +316,7 @@ describe('ScoreInput', () => {
     );
     selectPerDart();
     addNumberedDart('Single', 'S20');
+    fireEvent.click(screen.getByRole('button', { name: 'Triple' }));
     firstRender.unmount();
 
     render(<ScoreInput state={createState()} onStateChange={vi.fn()} />);
@@ -231,6 +324,7 @@ describe('ScoreInput', () => {
 
     expect(screen.getByText('Live total: 0')).toBeInTheDocument();
     expect(screen.getAllByText('Empty')).toHaveLength(3);
+    expect(screen.getByText('Dart 1 of 3')).toBeInTheDocument();
     expect(screen.queryByRole('group', { name: 'Board numbers' })).not.toBeInTheDocument();
   });
 });
