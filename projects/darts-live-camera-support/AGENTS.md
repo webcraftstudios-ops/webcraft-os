@@ -1,72 +1,32 @@
 # Darts Live Camera Support — Project Agent Rules
 
-This file adds project-specific rules below the repository root `AGENTS.md`. It may tighten, but never weaken, repository safety, Git, validation, or scope-control rules.
+This file adds Darts-specific rules below the repository root `AGENTS.md`. The root constitution remains authoritative for repository safety, Git discipline, scope control, secrets, dependencies, validation honesty, and collaboration.
 
-## 1. Product objective
+## 1. Product mode
 
-Build a reliable, premium, TV-friendly darts scoring demo for cafés, dart clubs, small tournaments, and pilot users.
+Build a reliable, premium, TV-friendly darts scoring system for cafés, dart clubs, small tournaments, and pilot users.
 
-Current product mode:
+Current production mode:
 
-- human-confirmed scoring;
-- mock or camera-assisted evidence;
+- two-player 301/501 scoring;
+- human-confirmed score entry;
+- browser-camera and local RTSP snapshot evidence;
 - no claim of automatic visual recognition;
-- commercial proof and pilot readiness before computer-vision R&D.
+- OpenCV work remains experimental until an explicit integration issue is approved.
 
-## 2. Source of truth
+## 2. Project boundaries
 
-Use this priority order:
+Project root:
 
-1. explicit user instruction for the current task;
-2. active GitHub issue or sprint;
-3. this project `AGENTS.md`;
-4. repository root `AGENTS.md`;
-5. project documentation;
-6. current implementation and tests.
-
-Surface conflicts before editing.
-
-## 3. Standard Verdent workflow
-
-Every implementation sprint follows one sequential workflow on one feature branch:
-
-1. **Sprint Gatekeeper** — orientation, branch safety, scope, risks, validation plan;
-2. **Frontend Implementer** — approved Next.js/TypeScript/Tailwind implementation;
-3. **Specialist Pass** — sprint-specific technical review, such as responsive/fullscreen, motion, accessibility, or camera feasibility;
-4. **Regression Gatekeeper** — independent diff review, build, and applicable functional checks;
-5. **Branch & PR Publisher** — focused commit, push, and draft pull request after a positive QA verdict.
-
-Do not run multiple agents or worktrees that modify the same files for the same sprint. Parallel work requires separate branches or explicitly non-overlapping files.
-
-## 4. Mandatory orientation
-
-Before editing, run and report:
-
-```bash
-git status
-git branch --show-current
-git log -1 --oneline
-git fetch origin --prune
+```text
+projects/darts-live-camera-support/
 ```
 
-Then read:
+Application root:
 
-- the repository root `AGENTS.md`;
-- the active GitHub issue;
-- this file;
-- the relevant project documents and source files.
-
-Report:
-
-- sprint objective;
-- explicit non-goals;
-- expected changed files;
-- protected or read-only files;
-- technical risks;
-- validation plan;
-- any stop condition.
-
-## 5. Branch and publication rules
+```text
+projects/darts-live-camera-support/app/
+```
 
 Stable integration branch:
 
@@ -74,32 +34,57 @@ Stable integration branch:
 project/darts-live-camera-support
 ```
 
-Use one dedicated feature branch per issue. Never implement directly on the integration branch.
+Use one dedicated feature branch per issue. Never implement directly on the integration branch. Draft pull requests must target the integration branch and may not be merged without explicit user approval.
 
-Publishing is permitted only after the regression verdict is:
+## 3. Mandatory orientation
 
-```text
-APPROVE FOR PR
-```
+Before editing, follow the root `AGENTS.md` orientation and additionally inspect:
 
-Create a draft pull request targeting the integration branch. Never merge without explicit user approval.
+- the active GitHub issue;
+- this file;
+- the relevant section of `SPRINTS.md` and `ROADMAP.md`;
+- all source files and tests directly involved;
+- whether another agent is already working on the same branch or files.
 
-## 6. Protected behaviour
+Report:
+
+- objective and acceptance criteria;
+- explicit non-goals;
+- expected changed files;
+- protected files;
+- validation commands;
+- technical and operational risks;
+- stop conditions.
+
+## 4. Sequential execution workflow
+
+Every implementation issue follows one controlled sequence on one feature branch:
+
+1. **Sprint Gatekeeper** — confirm issue, branch, scope, risks, affected files, and validation plan.
+2. **Implementer** — make only the approved local change using existing architecture and conventions.
+3. **Specialist Pass** — perform the issue-specific review, such as UI/accessibility, scoring, camera, RTSP bridge, OpenCV, security, or deployment.
+4. **Regression Gatekeeper** — inspect the final diff and execute applicable automated and manual checks.
+5. **Branch & PR Publisher** — create a focused commit and update or open a draft PR only after a positive QA verdict.
+
+Do not run multiple agents or worktrees that modify the same files for the same issue. Parallel work requires separate branches or explicitly non-overlapping files.
+
+## 5. Protected game behaviour
 
 Do not change game behaviour unless the active issue explicitly authorizes it. Preserve:
 
-- score range validation;
+- valid turn score range;
 - score subtraction;
 - player switching;
 - bust behaviour;
 - exact-zero finish;
 - correction and undo;
 - history consistency;
-- 301/501 selection.
+- 301/501 selection;
+- snapshot-to-turn linkage.
 
-Keep domain logic separate from React presentation.
+Keep game and scoring logic separate from React presentation.
 
-Normally treat these files as read-only during visual sprints:
+During visual or camera-only work, normally treat these as protected:
 
 ```text
 app/src/domain/scoring.ts
@@ -109,81 +94,117 @@ package-lock.json
 .github/workflows/
 ```
 
-A necessary exception must be explained before modification.
+A necessary exception must be stated before modification and covered by targeted tests.
+
+## 6. Camera and recognition boundaries
+
+Camera capture, recognition, score confirmation, persistence, and presentation must remain separable concerns.
+
+The browser application may communicate with the local RTSP bridge only through its HTTP snapshot endpoint. Camera RTSP URLs and credentials must remain bridge-side and must never be committed or exposed through browser-visible environment variables.
+
+For the RTSP bridge:
+
+- bind to `127.0.0.1` by default;
+- restrict CORS to the configured application origin;
+- treat LAN exposure as an explicit security-sensitive opt-in;
+- preserve graceful offline, timeout, and recovery behaviour.
+
+OpenCV spikes prove technical feasibility only. Do not present spike output as production-ready automatic scoring. Calibration, detection, confidence scoring, and automatic score proposals require separate scoped issues and acceptance criteria.
 
 ## 7. Scope control
 
 Implement only the active issue. Do not silently add:
 
 - new game rules;
-- real camera capture;
-- OpenCV or AI recognition;
-- backend, database, authentication, or payments;
+- automatic recognition;
+- databases, authentication, or payments;
 - tournament logic;
-- deployment;
-- unrelated refactors or dependencies.
+- cloud camera streaming;
+- unrelated deployment work;
+- dependencies or refactors not required by the issue.
 
 Classify discovered work as:
 
 - `BLOCKING`;
 - `SHOULD FIX`;
-- `FUTURE SPRINT`.
+- `FUTURE ISSUE`.
 
-Only blocking, in-scope defects may be fixed before publication. Other work becomes a separate issue or recommendation.
+Only blocking, in-scope defects may be included before publication. Everything else becomes a separate issue or recommendation.
 
-## 8. Engineering rules
+## 8. Validation matrix
 
-- Use TypeScript strictly; do not bypass errors with `any` without justification.
-- Reuse design tokens and shared UI primitives.
-- Keep components focused and props explicit.
-- Preserve keyboard, focus, and touch usability.
-- Prefer browser/framework capabilities before adding dependencies.
-- Client-only browser APIs must not execute during server rendering.
-- Do not weaken or bypass CI.
+Run only checks applicable to the changed area, but do not omit a required gate.
 
-## 9. Validation gate
+### Darts application changes
 
-Minimum build validation:
+From `projects/darts-live-camera-support/app`:
 
 ```bash
-cd projects/darts-live-camera-support/app
 npm install
+npm run test:coverage
 npm run build
 ```
 
-Run applicable manual checks for:
+Use `npm ci` in clean CI environments when the lockfile is valid.
 
-- match setup;
-- 301/501 selection;
-- normal score input;
+Applicable manual regression checks include:
+
+- match setup and 301/501 selection;
+- normal and invalid score input;
 - player switching;
-- invalid score and bust;
-- exact-zero finish;
-- undo and correction;
-- mock image linkage;
-- turn history;
-- responsive layout;
-- fullscreen or other sprint-specific behaviour.
+- bust and exact-zero finish;
+- correction and undo;
+- snapshot capture, discard, confirmation, and turn-history linkage;
+- responsive and fullscreen behaviour;
+- offline/error recovery.
+
+### RTSP bridge changes
+
+From `projects/darts-live-camera-support/tools/rtsp-snapshot-bridge`:
+
+```bash
+node --test
+```
+
+Also verify applicable operational behaviour:
+
+- localhost binding;
+- restricted CORS;
+- bridge-offline and camera-offline errors;
+- recovery without restarting the application;
+- credentials remain bridge-side.
+
+### OpenCV spike changes
+
+Document:
+
+- input images and assumptions;
+- manual or automated reproduction steps;
+- observed result;
+- failure cases;
+- why the result is a spike rather than production acceptance.
 
 Never claim a check passed unless it was actually executed or explicitly confirmed by the user.
 
-## 10. Completion report
+## 9. Completion report
 
 Every implementation session ends with:
 
 ```text
 Status:
+Issue:
 Branch:
 Commit:
 Scope completed:
 Files changed:
 Validation executed:
-Build result:
+Automated result:
 Manual checks:
+Security or privacy checks:
 QA verdict:
 Known limitations:
 Deferred items:
-Recommended next sprint:
+Recommended next issue:
 PR number and URL:
 CI status:
 ```
