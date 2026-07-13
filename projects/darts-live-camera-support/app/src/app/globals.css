@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Orbitron:wght@700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+
+  --dl-bg: #000000;
+  --dl-surface: #111113;
+  --dl-surface-strong: #09090b;
+  --dl-border: #27272a;
+  --dl-text: #ffffff;
+  --dl-muted: #84848f;
+  --dl-primary: #10b981; /* Opgeschaald naar neon/darts groen */
+  --dl-primary-glow: rgba(16, 185, 129, 0.4);
+  --dl-success: #10b981;
+  --dl-warning: #f59e0b;
+  --dl-danger: #ef4444;
+  --dl-gold: #fbbf24;
+  --dl-gold-glow: rgba(251, 191, 36, 0.4);
+
+  --dl-radius-lg: 1rem;
+  --dl-radius-xl: 1.5rem;
+  --dl-radius-2xl: 2rem;
+  --dl-shadow-tv: 0 32px 90px rgb(0 0 0 / 0.7);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--dl-bg);
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, var(--dl-primary-glow), transparent 38rem),
+    radial-gradient(circle at bottom right, var(--dl-gold-glow), transparent 34rem),
+    var(--dl-bg);
+  color: var(--dl-text);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.dl-score-font {
+  font-family: 'Orbitron', 'Inter', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums; /* Zorgt dat scores niet 'dansen' */
+}
+
+.dl-card {
+  border: 1px solid var(--dl-border);
+  background: linear-gradient(180deg, rgb(24 24 27 / 0.96), rgb(9 9 11 / 0.98));
+  border-radius: var(--dl-radius-xl);
+  box-shadow: var(--dl-shadow-tv);
+}
+
+.dl-panel {
+  border: 1px solid var(--dl-border);
+  background: rgb(15 15 18 / 0.96);
+  border-radius: var(--dl-radius-lg);
+}
+
+.dl-kicker {
+  color: var(--dl-muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+
+.dl-primary-button {
+  border-radius: 999px;
+  background: var(--dl-text);
+  color: var(--dl-bg);
+  font-weight: 900;
+  padding: 0.85rem 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.dl-secondary-button {
+  border: 1px solid var(--dl-border);
+  border-radius: 999px;
+  color: var(--dl-text);
+  font-weight: 800;
+  padding: 0.85rem 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}

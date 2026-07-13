@@ -1,0 +1,23 @@
+{
+  "name": "Darts Live Camera Support",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "workspaceFolder": "/workspaces/webcraft-os",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bradlc.vscode-tailwindcss",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Darts scoreboard app",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "postCreateCommand": "cd projects/darts-live-camera-support/app && npm install",
+  "postAttachCommand": "cd projects/darts-live-camera-support/app && npm run dev"
+}
