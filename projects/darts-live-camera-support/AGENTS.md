@@ -16,6 +16,8 @@ Current production mode:
 
 ## 2. Project boundaries
 
+Unless a command explicitly changes directory, file paths in this document are repository-relative.
+
 Project root:
 
 ```text
@@ -87,11 +89,11 @@ Keep game and scoring logic separate from React presentation.
 During visual or camera-only work, normally treat these as protected:
 
 ```text
-app/src/domain/scoring.ts
-app/src/domain/types.ts
-package.json
-package-lock.json
-.github/workflows/
+projects/darts-live-camera-support/app/src/domain/scoring.ts
+projects/darts-live-camera-support/app/src/domain/types.ts
+projects/darts-live-camera-support/app/package.json
+projects/darts-live-camera-support/app/package-lock.json
+.github/workflows/darts-scoreboard-build.yml
 ```
 
 A necessary exception must be stated before modification and covered by targeted tests.
