@@ -99,15 +99,32 @@ export function appendDart(
   darts: PendingDartSequence,
   dart: DartThrow,
 ): PendingDartSequence {
-  if (darts.length >= 3) {
-    throw new Error('A turn cannot contain more than three darts.');
+  switch (darts.length) {
+    case 0:
+      return [dart];
+    case 1:
+      return [darts[0], dart];
+    case 2:
+      return [darts[0], darts[1], dart];
+    case 3:
+      throw new Error('A turn cannot contain more than three darts.');
+    default:
+      throw new Error('Invalid pending dart sequence.');
   }
-
-  return [...darts, dart] as PendingDartSequence;
 }
 
 export function removeLastDart(darts: PendingDartSequence): PendingDartSequence {
-  return darts.slice(0, -1) as PendingDartSequence;
+  switch (darts.length) {
+    case 0:
+    case 1:
+      return [];
+    case 2:
+      return [darts[0]];
+    case 3:
+      return [darts[0], darts[1]];
+    default:
+      throw new Error('Invalid pending dart sequence.');
+  }
 }
 
 export function clearDarts(): PendingDartSequence {
