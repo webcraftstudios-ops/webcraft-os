@@ -10,9 +10,10 @@ import { CameraPreview } from '@/components/CameraPreview';
 
 export type ScoreboardProps = {
   state: MatchState;
+  onResetMatch: () => void;
 };
 
-export function Scoreboard({ state }: ScoreboardProps) {
+export function Scoreboard({ state, onResetMatch }: ScoreboardProps) {
   const currentPlayer = state.players.find((player) => player.id === state.match.currentPlayerId);
   const winner = state.players.find((player) => player.id === state.match.winnerPlayerId);
   const lastTurn = state.turns.at(-1);
@@ -112,7 +113,7 @@ export function Scoreboard({ state }: ScoreboardProps) {
       {winner && (
         <WinnerOverlay 
           winnerName={winner.name} 
-          onReset={() => window.location.reload()} 
+          onReset={onResetMatch} 
         />
       )}
     </Card>
