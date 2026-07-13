@@ -2,9 +2,7 @@
 
 ## Current status
 
-The project has completed its commercial framing, MVP definition, technical foundation, core scoreboard prototype, correction/undo flow, mock image support, Codespaces/CI setup, and the first premium visual-design sprint.
-
-Current integration branch:
+Integration branch:
 
 ```text
 project/darts-live-camera-support
@@ -14,22 +12,26 @@ Current product mode:
 
 - two-player 301/501;
 - human-confirmed scoring;
-- mock snapshot references;
-- premium TV-friendly demo;
-- automatic camera recognition deliberately deferred.
+- browser-camera and local RTSP snapshot capture;
+- snapshot-to-turn history linkage;
+- premium TV-friendly presentation;
+- automatic recognition not integrated into the production application.
 
-## Completed milestones
+There is currently **no automatically authorized implementation sprint**. The next issue must be selected explicitly after governance and product review.
 
-### Phase 0 — Definition and go/no-go
+## Completed work
+
+### Phase 0 — Commercial and technical framing
 
 Completed:
 
-- commercial target and value hypothesis;
+- target users and problem framing;
 - MVP and explicit non-goals;
-- technical stack and architecture direction;
+- Next.js/TypeScript/Tailwind direction;
+- human-confirmed camera-assisted workflow;
 - demo and validation plan.
 
-### Phase 1 — Scoreboard prototype
+### Phase 1 — Core scoreboard
 
 Completed:
 
@@ -39,152 +41,88 @@ Completed:
 - player switching;
 - bust and exact-zero finish;
 - turn history;
-- undo and score correction;
-- mock image linkage;
-- build workflow and Codespaces support.
+- correction and undo.
 
-### Sprint 2.2.2.1 — Design foundation
+### Premium demo and operator foundation
 
-Status: completed and merged through PR #24.
+| Work | Status | GitHub reference | Result |
+|---|---|---|---|
+| Design foundation | Completed | PR #24 | Shared tokens, UI primitives, premium TV-readable layout |
+| Responsive TV layout and kiosk mode | Completed | Issue #25, PR #27 | Desktop/TV layout, mobile stacking, fullscreen support |
+| GitHub Pages demo deployment | Completed | PR #28 | Static demo deployment workflow |
+| Premium visual design and winner overlay | Completed | Issue #22, PR #31 | Active-player treatment and finished-match presentation |
+| Scoring-domain tests | Completed | Issue #32, PR #33 | Automated coverage for validation, bust, finish, correction, and undo |
+| Match setup and configuration | Completed | Issue #36, PR #37 | Player names and 301/501 setup flow |
 
-Delivered:
+### Camera-assisted workflow
 
-- shared design tokens;
-- reusable UI primitives;
-- premium scoreboard styling;
-- TV-readable scores and active-player state;
-- corrected three-column player/turn/player layout.
+| Work | Status | GitHub reference | Result |
+|---|---|---|---|
+| Mock camera preview and linkage | Completed | Issue #34, PR #35 | Snapshot evidence linked to turns |
+| Browser camera capture | Completed | Issue #38, PR #39 | `getUserMedia` snapshot capture |
+| Real IP camera via RTSP bridge | Completed | Issue #46, PR #47 | Local ffmpeg bridge, C100 hardware acceptance, error recovery, credential isolation |
 
-## Active sprint
+Sprint 2.7 was accepted with an explicit hardware waiver: the physical end-to-end test used a Tapo C100 using the same local Tapo RTSP mechanism. A physical C110 test remains advisable before guaranteeing the C110 as bundled pilot hardware, but it is not an open software-sprint blocker.
 
-### Sprint 2.2.2.2 — Responsive TV layout & kiosk mode
+### Computer-vision feasibility spikes
 
-GitHub issue: #25
+| Work | Status | GitHub reference | Evidence level |
+|---|---|---|---|
+| Perspective correction and coordinate-to-score mapping | Spike completed | PR #42 | Feasibility demonstrated with controlled image input |
+| Image subtraction and dart candidate isolation | Spike completed | PR #44 | Feasibility demonstrated with test images |
 
-Branch:
+These spikes are not production automatic recognition. They do not authorize integration into the main application without a new issue, architecture review, failure criteria, and human-confirmation safeguards.
 
-```text
-feature/darts-responsive-kiosk
-```
+## Current governance gate
 
-Goal:
+Before starting more implementation:
 
-Make the premium demo robust on desktop, 16:9 TV, laptop, tablet, and mobile, with a safe browser-fullscreen mode.
+1. confirm that existing open issues still match the current product state;
+2. choose one issue as the next commercial or operational priority;
+3. define the smallest testable scope and explicit non-goals;
+4. assign one branch and one executing agent;
+5. define automated, manual, hardware, and security checks before editing.
 
-Scope:
+## Candidate next issues
 
-- preserve `Player 1 | Current turn | Player 2` on wide screens;
-- improve 16:9 spacing and scanability;
-- define deliberate tablet/mobile stacking;
-- prevent horizontal overflow;
-- keep controls touch-friendly;
-- add defensive fullscreen enter/exit behaviour and fallback;
-- preserve all existing score behaviour.
+### Issue #40 — Reset match flow after win
 
-Explicit non-goals:
+Type: small pilot-readiness improvement.
 
-- animations;
-- winner overlay;
-- camera recognition;
-- backend or authentication;
-- new game modes or rules;
-- deployment.
+Potential value:
 
-Definition of Done:
+- removes the need to refresh after a completed match;
+- improves café/club demo continuity;
+- keeps camera cleanup and undo behaviour explicit.
 
-- responsive smoke tests pass;
-- fullscreen opens and exits safely;
-- operator controls remain usable;
-- no score/name clipping;
-- existing functional flows remain intact;
-- `npm run build` and GitHub Actions succeed;
-- draft PR is created but not merged without user approval.
+This is the smaller and lower-risk implementation candidate.
 
-## Planned premium-design sprints
+### Issue #45 — OpenCV setup and calibration UI
 
-### Sprint 2.2.2.3 — Motion & live-state feedback
+Type: larger experimental integration.
 
-Start only after Sprint 2.2.2.2 is merged.
+Required before start:
 
-Scope:
+- confirm that calibration integration is commercially justified now;
+- separate spike code from production architecture;
+- define browser performance and asset-loading constraints;
+- define calibration persistence and reset behaviour;
+- preserve manual scoring as the final decision path;
+- add explicit failure and fallback criteria.
 
-- restrained score-update feedback;
-- clear active-player transition;
-- short bust/status feedback;
-- stable layout during transitions;
-- `prefers-reduced-motion` support.
-
-Not in scope:
-
-- winner overlay;
-- sound;
-- new rules;
-- camera functionality.
-
-### Sprint 2.2.2.4 — Finish overlay & winner presentation
-
-Start only after Sprint 2.2.2.3 is merged.
-
-Scope:
-
-- premium finished-match state;
-- clear winner presentation;
-- close/return behaviour;
-- TV, tablet, and mobile compatibility;
-- no heavy celebration dependency.
-
-### Sprint 2.2.2.5 — Premium demo QA & accessibility
-
-Start only after Sprint 2.2.2.4 is merged.
-
-Scope:
-
-- contrast and readability;
-- keyboard and focus behaviour;
-- touch targets;
-- long names and extreme UI states;
-- fullscreen/browser fallbacks;
-- final cross-viewport regression;
-- demo screenshots and remaining style cleanup.
-
-When complete, parent issue #22 — Premium visual design — may be closed after final validation.
-
-## Next commercial phase: pilot-ready demo
-
-After Sprint 2.2.2.5, hold a product go/no-go review before computer-vision work.
-
-Proposed sequence:
-
-1. **2.3.1 — Operator workflow & match controls**
-2. **2.3.2 — Online preview deployment**
-3. **2.3.3 — Café/dart-club pilot feedback**
-4. **2.3.4 — Camera feasibility spike**
-
-The camera feasibility spike begins only after the scoreboard workflow has demonstrated real user value.
-
-## Sprint status table
-
-| Sprint | Status | GitHub reference | Branch | Primary output | Next gate |
-| --- | --- | --- | --- | --- | --- |
-| Phase 0 — Definition | Completed | — | — | Commercial framing, MVP, non-goals | Superseded by Phase 1 |
-| Phase 1 — Scoreboard prototype | Completed | — | — | Core 301/501 scoring flow | Superseded by 2.2.2.1 |
-| 2.2.2.1 — Design foundation | Completed & merged | Issue #23, PR #24 | `feature/darts-design-foundation` (deleted) | Design tokens, UI primitives, corrected grid | Merged into `project/darts-live-camera-support` |
-| 2.2.2.2 — Responsive TV layout & kiosk mode | Active | Issue #25 | `feature/darts-responsive-kiosk` | Responsive/kiosk scoreboard | Regression QA → draft PR → user merge approval |
-| 2.2.2.3 — Motion & live-state feedback | Planned | Parent #22 | Not yet created | Restrained transition feedback | Start after 2.2.2.2 merged |
-| 2.2.2.4 — Finish overlay & winner presentation | Planned | Parent #22 | Not yet created | Winner presentation state | Start after 2.2.2.3 merged |
-| 2.2.2.5 — Premium demo QA & accessibility | Planned | Parent #22 | Not yet created | Cross-viewport regression, accessibility | Closes parent issue #22 after acceptance |
+Do not start issue #45 merely because the feasibility spikes succeeded.
 
 ## Standard execution flow
 
-Each implementation sprint uses this sequential gate:
-
 ```text
-orientation and scope
-→ implementation
-→ sprint-specific specialist pass
-→ independent regression QA
+issue selection and acceptance criteria
+→ orientation and branch safety
+→ scoped implementation
+→ issue-specific specialist review
+→ automated and manual regression QA
+→ APPROVE FOR PR or CHANGES REQUIRED
 → draft PR
 → explicit human merge approval
 ```
 
-Project-specific details are defined in `AGENTS.md`. One active issue and one feature branch remain the default unit of work.
+Project-specific rules are defined in `AGENTS.md`. One active issue and one feature branch remain the default unit of work.
