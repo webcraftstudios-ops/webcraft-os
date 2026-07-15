@@ -32,8 +32,11 @@ Status:
 
 ```text
 status: partially_validated
-decision_status: not_closed
+decision_status: formally_closed
+decision: continue_with_constraints
 ```
+
+Formal closure means the phase evidence and limitations are sufficiently documented. It does not mean the commercial model is validated.
 
 ## What is not proven
 
@@ -47,6 +50,8 @@ The available evidence does not prove:
 - a production webshop or marketplace;
 - customer acquisition or repeat demand.
 
+The primary remaining uncertainty is profitable delivery time and repeatable value per sourcing case.
+
 ## Executed evidence
 
 - Spike03: three privacy-safe test cases summarized in [spike03/validation-evidence.md](spike03/validation-evidence.md).
@@ -55,8 +60,20 @@ The available evidence does not prove:
 
 Run 003 and Run 004 are prepared but not started and are excluded from executed metrics.
 
+## Current governance conclusion
+
+```text
+project_status: continue_with_constraints
+active_phase: canonicalization_and_formal_closure_of_spike04
+build_permission: no
+automation_permission: no
+```
+
+One bounded post-Spike04 commercial validation case may be performed only as defined in [NEXT-STEP.md](NEXT-STEP.md). No sourcing is executed as part of the canonicalization change itself.
+
 ## Evidence sources
 
 - `PR1@4df73c7ffd0906b652809c70311ae83cb92773b3:spikes/spike03-intake-caseview/`
 - `PR2@fc9991e0d3912c193319b3484c376f9fb94089b9:spikes/spike04-manual-source-check/`
 - `PR29@5e68d39ddf5943f7263a799bd5ac0b86e6ef3986:projects/commercial-webshop-builder/validation-log.md`
+- Formal closure authority: Issue #57.
