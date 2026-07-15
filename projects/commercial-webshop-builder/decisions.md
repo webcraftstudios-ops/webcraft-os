@@ -60,3 +60,27 @@ The canonical dossier contains exactly 23 project files. Historical pull request
 - merge requires projectmanager review.
 
 **Tracking:** Issue #54.
+
+## Decision 006 — Treat €19 and €46 as unvalidated pilot hypotheses
+
+The figures **€19** and **€46** are pilot pricing hypotheses only. They are not validated prices, publicly authorized prices or permission to make an offer.
+
+```text
+payment_validation: not_started
+public_price_authorization: no
+payment_permission: no
+```
+
+No payment request, checkout, Mollie, Stripe or other payment implementation is authorized.
+
+## Decision 007 — One new case does not close Spike04
+
+The next action remains exactly one privacy-safe manual validation case with a maximum of 60 minutes of active sourcing.
+
+Completing that case does not automatically close Spike04. After active time, outcome, lead quality and specification enrichment are registered, the projectmanager must make a new decision about Spike04.
+
+## Decision 008 — Preserve source hierarchy
+
+CCP Finder Operations Manual v1.0 is a supporting operational source for executing and interpreting the manual process. It does not replace repository governance or the canonical project status.
+
+After PR #55 is merged, GitHub `main` contains the canonical project status. Until then, this draft branch remains a proposed canonical dossier and merge is not authorized.
