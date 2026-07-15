@@ -4,13 +4,16 @@
 
 ```text
 status: partially_validated
-decision_status: not_closed
-direction: improve_intake + continue_manual_tests
+decision_status: formally_closed
+decision: continue_with_constraints
+direction: improve_intake_before_next_commercial_test
 ```
+
+Spike04 is formally closed as a learning phase. The closure records the available findings and limitations; it does not claim that profitability, willingness to pay or repeatability has been validated.
 
 ## Purpose
 
-Spike04 tests whether technically complete requests can produce useful manual sourcing outcomes and whether the sourcing process is repeatable, measurable and commercially promising.
+Spike04 tested whether technically complete requests can produce useful manual sourcing outcomes and whether the sourcing process is repeatable, measurable and commercially promising.
 
 ## Current evidence
 
@@ -20,6 +23,18 @@ Spike04 tests whether technically complete requests can produce useful manual so
 - Run 004: `prepared_not_started`.
 
 Run 003 and Run 004 are not included in executed metrics.
+
+## Closure result
+
+The phase produced reusable manual sourcing and intake-learning evidence but did not prove:
+
+- repeatable hard product leads;
+- profitable delivery time;
+- willingness to pay;
+- validated pricing;
+- readiness for automation.
+
+The project therefore continues only with the constraints defined in [../current-status.md](../current-status.md). The single next action is defined in [../NEXT-STEP.md](../NEXT-STEP.md).
 
 ## Canonical documents
 
@@ -35,3 +50,5 @@ Run 003 and Run 004 are not included in executed metrics.
 ## Historical source
 
 `PR2@fc9991e0d3912c193319b3484c376f9fb94089b9:spikes/spike04-manual-source-check/`
+
+Formal closure authority: Issue #57.
