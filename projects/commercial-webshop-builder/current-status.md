@@ -13,6 +13,8 @@ Spike04:
   status: partially_validated
   decision_status: not_closed
   direction: improve_intake + continue_manual_tests
+  closes_after_next_case: no
+  next_decision_actor: projectmanager
 
 Run 001:
   status: executed
@@ -28,19 +30,34 @@ Run 004:
   status: prepared_not_started
   included_in_executed_metrics: no
 
+pilot_price_hypotheses: EUR 19 and EUR 46
+price_validation_status: not_started
+public_price_authorization: no
 build_permission: no
 automation_permission: no
 payment_permission: no
-merge_permission: projectmanager_review_required
+payment_implementation_permission: no
+merge_permission: not_granted
 
+next_validation_case_count: 1
+maximum_active_sourcing_time_minutes: 60
 primary_uncertainty: profitable delivery time and repeatable value per case
 current_action_count: 1
 current_action_source: NEXT-STEP.md
+operations_manual_role: supporting_operational_source
+canonical_status_after_merge: GitHub main
+next_required_actor: projectmanager
 ```
 
 ## Interpretation
 
 The intake chain is technically sufficient for manual validation. Manual sourcing has produced useful process and intake findings, but it has not yet proven a repeatable, profitable service or justified automation.
+
+The figures €19 and €46 remain unvalidated pilot pricing hypotheses. They are not publicly authorized prices and do not permit a payment request, checkout, Mollie, Stripe or another payment implementation.
+
+The next case is one bounded evidence action, not an automatic Spike04 closure. After active sourcing time, outcome, lead quality and specification enrichment are recorded, the projectmanager must make a new decision.
+
+CCP Finder Operations Manual v1.0 supports operational execution. After merge, GitHub `main` is the canonical source for project status and governance.
 
 The authoritative current action is [NEXT-STEP.md](NEXT-STEP.md).
 
