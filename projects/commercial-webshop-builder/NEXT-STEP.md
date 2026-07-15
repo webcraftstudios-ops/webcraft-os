@@ -1,6 +1,6 @@
 # Next Step
 
-Voer één nieuwe privacyveilige handmatige validatiecase uit met de
+Voer precies één nieuwe privacyveilige handmatige validatiecase uit met de
 verbeterde categoriegestuurde intake.
 
 ## Timebox
@@ -39,5 +39,10 @@ Werk na afloop het bewijs bij volgens:
 * [spike04/manual-sourcing-sop.md](spike04/manual-sourcing-sop.md)
 * [spike04/go-no-go.md](spike04/go-no-go.md)
 
-Dit is de enige actuele projectactie. Start geen automatisering, betaling,
-softwarebouw, storefront of parallelle sourcingrun.
+Deze ene case sluit Spike04 niet automatisch af. Nadat actieve tijd, uitkomst,
+leadkwaliteit en specificatieverrijking zijn geregistreerd, neemt de
+projectmanager een nieuw besluit over Spike04.
+
+Dit is de enige actuele projectactie. Start geen parallelle sourcingrun en
+voer geen automatisering, betaalverzoek, checkout, Mollie-, Stripe- of andere
+betalingsimplementatie, softwarebouw of storefront uit.
