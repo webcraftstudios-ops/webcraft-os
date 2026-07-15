@@ -2,8 +2,13 @@
 
 ```text
 project: Classic Parts Finder
-canonical_target_branch: main
+project_status: continue_with_constraints
+active_phase: canonicalization_and_formal_closure_of_spike04
+canonical_branch: main
+future_canonical_branch_count: 1
 commercial_model: productized sourcing service
+workflow_control_plane: GitHub
+verdent_in_current_workflow: no
 
 Spike03:
   status: technically_validated
@@ -11,10 +16,10 @@ Spike03:
 
 Spike04:
   status: partially_validated
-  decision_status: not_closed
-  direction: improve_intake + continue_manual_tests
-  closes_after_next_case: no
-  next_decision_actor: projectmanager
+  decision_status: formally_closed
+  decision: continue_with_constraints
+  direction: improve_intake_before_next_commercial_test
+  closure_basis: existing_evidence_plus_issue_57_governance
 
 Run 001:
   status: executed
@@ -39,32 +44,32 @@ payment_permission: no
 payment_implementation_permission: no
 merge_permission: not_granted
 
-next_validation_case_count: 1
+next_commercial_test_count: 1
 maximum_active_sourcing_time_minutes: 60
-primary_uncertainty: profitable delivery time and repeatable value per case
+primary_uncertainty: profitable delivery time and repeatable value per sourcing case
 current_action_count: 1
 current_action_source: NEXT-STEP.md
 operations_manual_role: supporting_operational_source
-canonical_status_after_merge: GitHub main
 next_required_actor: projectmanager
 ```
 
 ## Interpretation
 
-The intake chain is technically sufficient for manual validation. Manual sourcing has produced useful process and intake findings, but it has not yet proven a repeatable, profitable service or justified automation.
+The intake chain is technically sufficient for bounded manual validation. Manual sourcing produced useful process and intake findings, but it has not proven repeatable profitability, willingness to pay or a reliable automation case.
+
+Spike04 is formally closed as a learning phase with the decision `continue_with_constraints`. Closure records the current evidence and prevents the phase from remaining indefinitely open. It does not upgrade partial evidence into commercial validation.
 
 The figures €19 and €46 remain unvalidated pilot pricing hypotheses. They are not publicly authorized prices and do not permit a payment request, checkout, Mollie, Stripe or another payment implementation.
 
-The next case is one bounded evidence action, not an automatic Spike04 closure. After active sourcing time, outcome, lead quality and specification enrichment are recorded, the projectmanager must make a new decision.
-
-CCP Finder Operations Manual v1.0 supports operational execution. After merge, GitHub `main` is the canonical source for project status and governance.
+GitHub `main` is the only future canonical branch for this project. Historical branches and pull requests remain evidence sources only. Verdent is not used in the current workflow.
 
 The authoritative current action is [NEXT-STEP.md](NEXT-STEP.md).
 
 ## Evidence
 
 - Spike03 technical decision: `PR2@fc9991e0d3912c193319b3484c376f9fb94089b9:spikes/spike03-intake-caseview/06-decision/go-no-go.md`
-- Spike04 open decision: `PR2@fc9991e0d3912c193319b3484c376f9fb94089b9:spikes/spike04-manual-source-check/07-decision/go-no-go.md`
+- Spike04 historical open decision: `PR2@fc9991e0d3912c193319b3484c376f9fb94089b9:spikes/spike04-manual-source-check/07-decision/go-no-go.md`
 - Run 001 evidence: `PR2@fc9991e0d3912c193319b3484c376f9fb94089b9:spikes/spike04-manual-source-check/06-results/run-001-7Xo88NP.md`
 - Run 002 decision: `PR2@fc9991e0d3912c193319b3484c376f9fb94089b9:spikes/spike04-manual-source-check/07-decision/run-002-decision-note.md`
 - Consolidated Spike03 summary: `PR29@5e68d39ddf5943f7263a799bd5ac0b86e6ef3986:projects/commercial-webshop-builder/decisions.md`
+- Formal closure and workflow governance: Issue #57.
