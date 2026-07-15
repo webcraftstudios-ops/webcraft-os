@@ -6,11 +6,14 @@ The project is in validation, not production development.
 
 ## Current status
 
+- Project status: `continue_with_constraints`.
+- Active phase: `canonicalization_and_formal_closure_of_spike04`.
 - Spike03: `technically_validated` with decision `go_source_check`.
-- Spike04: `partially_validated`, `not_closed`.
-- Direction: `improve_intake + continue_manual_tests`.
-- Build, automation, and payment work are not authorized.
-- Canonical target branch: `main`.
+- Spike04: `partially_validated`, `formally_closed`, with decision `continue_with_constraints`.
+- Primary uncertainty: profitable delivery time and repeatable value per sourcing case.
+- Build, automation and payment work are not authorized.
+- `main` is the only future canonical branch.
+- Verdent is not used in the current workflow.
 
 See [current-status.md](current-status.md) for the complete status block.
 
@@ -21,7 +24,7 @@ See [current-status.md](current-status.md) for the complete status block.
 - [AGENTS.md](AGENTS.md) — project rules and evidence policy.
 - [product-definition.md](product-definition.md) — problem, buyer, service and boundaries.
 - [current-status.md](current-status.md) — current machine-readable status.
-- [decisions.md](decisions.md) — approved decision history.
+- [decisions.md](decisions.md) — approved and superseded decision history.
 - [validation-summary.md](validation-summary.md) — what is and is not proven.
 - [metrics.md](metrics.md) — aggregated metrics from executed validation only.
 - [NEXT-STEP.md](NEXT-STEP.md) — the single current action.
@@ -40,7 +43,7 @@ See [current-status.md](current-status.md) for the complete status block.
 
 ### Spike04
 
-- [spike04/README.md](spike04/README.md) — phase overview.
+- [spike04/README.md](spike04/README.md) — phase overview and formal closure status.
 - [spike04/scope.md](spike04/scope.md) — scope and completion criteria.
 - [spike04/manual-sourcing-sop.md](spike04/manual-sourcing-sop.md) — manual operating procedure.
 - [spike04/specification-refinement-loop.md](spike04/specification-refinement-loop.md) — request-refinement method.
@@ -48,7 +51,7 @@ See [current-status.md](current-status.md) for the complete status block.
 - [spike04/validation-evidence.md](spike04/validation-evidence.md) — consolidated phase evidence.
 - [spike04/run-001-summary.md](spike04/run-001-summary.md) — executed first run.
 - [spike04/run-002-summary.md](spike04/run-002-summary.md) — partially executed and closed second run.
-- [spike04/go-no-go.md](spike04/go-no-go.md) — current phase gate.
+- [spike04/go-no-go.md](spike04/go-no-go.md) — formal closure decision and constraints.
 
 ## Historical evidence
 
@@ -59,4 +62,4 @@ The canonical dossier summarizes rather than copies every historical artifact.
 - `PR2@fc9991e0d3912c193319b3484c376f9fb94089b9`
 - `PR29@5e68d39ddf5943f7263a799bd5ac0b86e6ef3986`
 
-Issue #54 governs this canonicalization.
+Issue #54 established the initial canonical dossier. Issue #57 governs the current status alignment and formal closure of Spike04.

@@ -1,5 +1,15 @@
 # Spike04 Validation Evidence
 
+## Phase status
+
+```text
+status: partially_validated
+decision_status: formally_closed
+decision: continue_with_constraints
+```
+
+Formal closure is a governance decision based on the recorded evidence and limitations. It does not add unobserved results.
+
 ## Canonical run statuses
 
 ```text
@@ -52,4 +62,5 @@ See [../metrics.md](../metrics.md).
 
 - Run 001: `PR2@fc9991e0d3912c193319b3484c376f9fb94089b9:spikes/spike04-manual-source-check/06-results/run-001-7Xo88NP.md`
 - Run 002: `PR2@fc9991e0d3912c193319b3484c376f9fb94089b9:spikes/spike04-manual-source-check/07-decision/run-002-decision-note.md`
-- Open phase decision: `PR2@fc9991e0d3912c193319b3484c376f9fb94089b9:spikes/spike04-manual-source-check/07-decision/go-no-go.md`
+- Historical open phase decision: `PR2@fc9991e0d3912c193319b3484c376f9fb94089b9:spikes/spike04-manual-source-check/07-decision/go-no-go.md`
+- Formal closure authority: Issue #57.

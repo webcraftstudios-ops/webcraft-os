@@ -48,11 +48,14 @@ Evidence:
 - `PR2@fc9991e0d3912c193319b3484c376f9fb94089b9:spikes/spike04-manual-source-check/06-results/run-002-R002_LIGHT_911_BOSCH.md`
 - `PR2@fc9991e0d3912c193319b3484c376f9fb94089b9:spikes/spike04-manual-source-check/07-decision/run-002-decision-note.md`
 
-## Missing decision metrics
+## Primary uncertainty after Spike04
 
-Spike04 still needs evidence for:
+Spike04 is formally closed with constraints, but the project still lacks evidence for:
 
 - delivery time on a new privacy-safe real or realistic case;
 - outcome quality under the improved intake;
 - repeatability across more than one completed sourcing case;
-- a final `continue_manual_tests`, `improve_intake`, `stop_concept`, or later automation decision.
+- willingness to pay and validated pricing;
+- profitable delivery time and repeatable value per sourcing case.
+
+These are project-level uncertainties for the next commercial test, not reasons to keep Spike04 administratively open.
