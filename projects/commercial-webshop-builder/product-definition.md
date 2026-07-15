@@ -47,7 +47,17 @@ The original Spike01 considered:
 - paid personal search help;
 - an annual offer for specialists or parts dealers.
 
-These are hypotheses, not validated prices or authorized offers. Payment validation has not started.
+The figures **€19** and **€46** are pilot pricing hypotheses only. They are not validated prices, approved public prices or authorized offers. Payment validation has not started.
+
+## Payment boundary
+
+```text
+payment_permission: no
+public_price_authorization: no
+payment_validation: not_started
+```
+
+No payment request may be sent and no checkout, Mollie, Stripe or other payment implementation may be created under the current scope.
 
 ## Current direction
 
