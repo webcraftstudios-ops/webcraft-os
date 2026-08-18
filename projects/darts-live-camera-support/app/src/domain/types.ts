@@ -1,3 +1,5 @@
+import type { DartSequence } from './darts';
+
 export type GameType = '301' | '501';
 
 export type MatchStatus = 'setup' | 'active' | 'finished';
@@ -24,6 +26,15 @@ export type PlayerScore = {
   remainingScore: number;
 };
 
+export type TurnEntry =
+  | Readonly<{
+      mode: 'quick-total';
+    }>
+  | Readonly<{
+      mode: 'per-dart';
+      darts: DartSequence;
+    }>;
+
 export type Turn = {
   id: string;
   matchId: string;
@@ -34,6 +45,7 @@ export type Turn = {
   scoreBefore: number;
   scoreAfter: number;
   isBust: boolean;
+  entry: TurnEntry;
   snapshotId?: string;
   createdAt: string;
 };
