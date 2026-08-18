@@ -226,71 +226,100 @@ export function ScoreInput({
           >
             {selectedMultiplier === null ? (
               <>
-                <p className="text-sm font-bold text-[var(--dl-text)]">
-                  {isDartLimitReached ? 'Three darts entered' : `Dart ${activeDartNumber} of 3`}
-                </p>
-                <p className="mt-1 text-sm text-[var(--dl-muted)]">
-                  {isDartLimitReached ? 'Confirm the turn or remove a dart.' : 'Choose the kind of hit.'}
-                </p>
+                <div className="flex items-start gap-3">
+                  <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-[var(--dl-text)] px-2 text-xs font-black text-[var(--dl-bg)]">
+                    1
+                  </span>
+                  <div>
+                    <h3 className="text-base font-black text-[var(--dl-text)]">
+                      {isDartLimitReached ? 'Three darts entered' : 'Choose a hit type'}
+                    </h3>
+                    {isDartLimitReached ? (
+                      <p className="mt-0.5 text-sm text-[var(--dl-muted)]">Confirm the turn or remove a dart.</p>
+                    ) : (
+                      <>
+                        <p className="mt-0.5 text-sm font-bold text-[var(--dl-text)]">Dart {activeDartNumber} of 3</p>
+                        <p className="mt-0.5 text-sm text-[var(--dl-muted)]">
+                          Start with Single, Double or Triple.
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
 
-                <div className="mt-4 grid grid-cols-3 gap-3" role="group" aria-label="Hit type">
+                <div className="mt-4 grid grid-cols-3 gap-2" role="group" aria-label="Hit type">
                   {DART_MULTIPLIERS.map((value) => (
                     <Button
-                      className="min-h-12"
+                      className="min-h-11 px-3 py-2.5"
                       disabled={isFinished || isDartLimitReached}
                       key={value}
                       onClick={() => setSelectedMultiplier(value)}
                       type="button"
-                      variant="secondary"
                     >
                       {MULTIPLIER_LABELS[value]}
                     </Button>
                   ))}
                 </div>
 
-                <div className="mt-3 grid grid-cols-3 gap-3" role="group" aria-label="Direct hits">
-                  <Button
-                    aria-label="Add MISS"
-                    className="min-h-12"
-                    disabled={isFinished || isDartLimitReached}
-                    onClick={() => addDart(MISS)}
-                    type="button"
-                    variant="secondary"
-                  >
-                    MISS
-                  </Button>
-                  <Button
-                    aria-label="Add 25"
-                    className="min-h-12"
-                    disabled={isFinished || isDartLimitReached}
-                    onClick={() => addDart(OUTER_BULL)}
-                    type="button"
-                    variant="secondary"
-                  >
-                    25
-                  </Button>
-                  <Button
-                    aria-label="Add BULL"
-                    className="min-h-12"
-                    disabled={isFinished || isDartLimitReached}
-                    onClick={() => addDart(BULLSEYE)}
-                    type="button"
-                    variant="secondary"
-                  >
-                    BULL
-                  </Button>
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <span className="mr-1 text-xs font-bold uppercase tracking-wider text-[var(--dl-muted)]">
+                    Or record directly
+                  </span>
+                  <div className="flex flex-wrap gap-2" role="group" aria-label="Direct hits">
+                    <Button
+                      aria-label="Add MISS"
+                      className="min-h-11 px-3 py-2 text-xs"
+                      disabled={isFinished || isDartLimitReached}
+                      onClick={() => addDart(MISS)}
+                      type="button"
+                      variant="secondary"
+                    >
+                      MISS
+                    </Button>
+                    <Button
+                      aria-label="Add 25"
+                      className="min-h-11 px-3 py-2 text-xs"
+                      disabled={isFinished || isDartLimitReached}
+                      onClick={() => addDart(OUTER_BULL)}
+                      type="button"
+                      variant="secondary"
+                    >
+                      25
+                    </Button>
+                    <Button
+                      aria-label="Add BULL"
+                      className="min-h-11 px-3 py-2 text-xs"
+                      disabled={isFinished || isDartLimitReached}
+                      onClick={() => addDart(BULLSEYE)}
+                      type="button"
+                      variant="secondary"
+                    >
+                      BULL
+                    </Button>
+                  </div>
                 </div>
               </>
             ) : (
               <>
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-bold text-[var(--dl-text)]">
-                      Dart {activeDartNumber} of 3 — {MULTIPLIER_LABELS[selectedMultiplier]}
-                    </p>
-                    <p className="mt-1 text-sm text-[var(--dl-muted)]">Choose the board number.</p>
+                  <div className="flex items-start gap-3">
+                    <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-[var(--dl-text)] px-2 text-xs font-black text-[var(--dl-bg)]">
+                      2
+                    </span>
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wider text-[var(--dl-muted)]">
+                        {MULTIPLIER_LABELS[selectedMultiplier]} selected
+                      </p>
+                      <h3 className="mt-0.5 text-base font-black text-[var(--dl-text)]">Choose a number</h3>
+                      <p className="mt-0.5 text-sm text-[var(--dl-muted)]">Dart {activeDartNumber} of 3</p>
+                    </div>
                   </div>
-                  <Button onClick={() => setSelectedMultiplier(null)} type="button" variant="secondary">
+                  <Button
+                    className="min-h-11 px-3 py-2 text-xs"
+                    onClick={() => setSelectedMultiplier(null)}
+                    type="button"
+                    variant="secondary"
+                  >
                     Back
                   </Button>
                 </div>
@@ -299,7 +328,7 @@ export function ScoreInput({
                   {DART_NUMBERS.map((value) => (
                     <Button
                       aria-label={`Add ${MULTIPLIER_PREFIXES[selectedMultiplier]}${value}`}
-                      className="min-h-12 px-2 py-2"
+                      className="inline-flex h-11 w-11 items-center justify-center justify-self-center p-0 tabular-nums"
                       disabled={isFinished || isDartLimitReached}
                       key={value}
                       onClick={() => addDart(createNumberedDart(value, selectedMultiplier))}

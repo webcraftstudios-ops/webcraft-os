@@ -91,11 +91,14 @@ describe('ScoreInput', () => {
     renderInput();
     selectPerDart();
 
+    expect(screen.getByRole('heading', { name: 'Choose a hit type' })).toBeInTheDocument();
+    expect(screen.getByText('Start with Single, Double or Triple.')).toBeInTheDocument();
     expect(screen.getByText('Dart 1 of 3')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Single' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Single' })).toHaveClass('dl-primary-button');
     expect(screen.getByRole('button', { name: 'Double' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Triple' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Add MISS' })).toBeInTheDocument();
+    expect(screen.getByText('Or record directly')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add MISS' })).toHaveClass('dl-secondary-button');
     expect(screen.getByRole('button', { name: 'Add 25' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Add BULL' })).toBeInTheDocument();
     expect(screen.queryByRole('group', { name: 'Board numbers' })).not.toBeInTheDocument();
@@ -114,11 +117,18 @@ describe('ScoreInput', () => {
 
     fireEvent.click(screen.getByRole('button', { name: hitType }));
 
-    expect(screen.getByText(`Dart 1 of 3 — ${hitType}`)).toBeInTheDocument();
+    expect(screen.getByText(`${hitType} selected`)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Choose a number' })).toBeInTheDocument();
+    expect(screen.getByText('Dart 1 of 3')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: 'Board numbers' })).toBeInTheDocument();
     for (let value = 1; value <= 20; value += 1) {
-      expect(screen.getByRole('button', { name: `Add ${prefix}${value}` })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: `Add ${prefix}${value}` })).toHaveClass(
+        'h-11',
+        'w-11',
+        'items-center',
+        'justify-center',
+      );
     }
 
     expect(screen.queryByRole('button', { name: 'Single' })).not.toBeInTheDocument();
