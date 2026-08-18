@@ -2,226 +2,238 @@
 
 ## Doel
 
-Van ruw app-idee naar een onderbouwde, testbare en bouwbare productblauwdruk zonder rollen door elkaar te halen.
+Van ruw app-idee naar een onderbouwde en bouwbare productblauwdruk, met HackMD als live workspace en afzonderlijke AI-rollen als specialisten.
 
-## Fase 0 — Intake
+## 0. Project Hub
 
-Bron: `project-brief.md`
+Elke app start met één HackMD **Project Hub**.
 
-Vul minimaal in:
+De Hub bevat:
 
-- probleem;
-- doelgroep;
+- één-zinsprobleem;
+- primaire doelgroep/gebruiker;
 - huidige workaround;
 - gewenste uitkomst;
-- bekende beperkingen;
-- eerste idee van succes.
+- huidige producthypothese;
+- belangrijkste bewijs/signalen;
+- grootste onzekerheden;
+- huidige MVP-scope;
+- gate-status;
+- links naar gespecialiseerde notes;
+- open beslispunten.
 
-Onbekende zaken mogen expliciet `onbekend` blijven.
+De Hub is een index en dashboard, geen mega-document.
 
----
+## 1. Product / User / Functional loop
 
-## Fase 1 — Product Gate
+Deze drie disciplines mogen itereren totdat de kern voldoende scherp is.
 
-**Agent:** Product Strategist
+### Product Strategist
 
-Vragen:
+Beantwoordt:
 
-- Is het probleem scherp genoeg?
-- Voor wie is het urgent?
-- Waarom zou iemand betalen of overstappen?
-- Welke aannames zijn het riskantst?
-- Wat is de kleinste verkoopbare/bruikbare versie?
+- welk probleem is waardevol genoeg;
+- voor wie;
+- waarom iemand zou betalen/adopteren;
+- welke aanname eerst bewezen moet worden;
+- wat de kleinste verkoopbare/bruikbare versie kan zijn.
 
-Output:
+### UX Researcher
 
-- product thesis;
-- doelgroep;
-- waardepropositie;
-- MVP-hypothese;
-- validatievraag;
-- kill/continue-advies.
+Beantwoordt:
 
-**Gate:** geen uitgebreide UX of architectuur als het kernprobleem nog fundamenteel onduidelijk is.
+- wat de gebruiker vandaag werkelijk doet;
+- in welke context het probleem ontstaat;
+- welke jobs-to-be-done en barrières relevant zijn;
+- welke aannames nog echte gebruikersdata vereisen.
 
----
+### Functional Analyst
 
-## Fase 2 — Functional Gate
+Beantwoordt:
 
-**Agent:** Functional Analyst
+- welke actors en rollen bestaan;
+- welke kernflow end-to-end moet werken;
+- welke business rules gelden;
+- welke uitzonderingen en statussen bestaan;
+- welke functionele requirements nodig zijn.
 
-Output:
+### Product gate
 
-- actors/rollen;
-- kernproces;
-- use cases;
-- business rules;
-- happy path;
-- uitzonderingen;
-- functionele requirements;
-- non-functional requirements die al bekend zijn.
+Ga pas verder wanneer:
 
-**Gate:** de kerngebruikerstaak moet end-to-end beschrijfbaar zijn.
+- het probleem concreet genoeg is;
+- doelgroep en gebruikscontext begrijpelijk zijn;
+- de kerngebruikerstaak benoemd is;
+- de belangrijkste aannames zichtbaar zijn;
+- er een voorlopige kleinste versie is.
 
----
+Bij grote twijfel: Product Critic inzetten en/of valideren vóór verdere uitwerking.
 
-## Fase 3 — User Gate
+## 2. Interaction loop
 
-**Agent:** UX Researcher
+### UX Designer
 
-Output:
+Ontwerpt:
 
-- gebruikerscontext;
-- jobs-to-be-done;
-- pijnpunten;
-- informatiebehoeften;
-- aannames die met echte gebruikers getest moeten worden;
-- onderzoeks-/validatievragen.
-
-**Gate:** ontwerpkeuzes mogen niet uitsluitend op interne aannames rusten wanneer gebruikersonzekerheid groot is.
-
----
-
-## Fase 4 — Interaction Gate
-
-**Agent:** UX Designer
-
-Output:
-
-- primary user flow;
+- primary flow;
 - alternatieve/error flows;
-- navigatiestructuur;
-- wireframe-beschrijvingen;
-- states en feedbackmomenten.
+- navigatie;
+- systeemfeedback;
+- herstelpaden;
+- schermdoelen.
 
-Daarna verfijnt de **Product Designer**:
+### Product Designer
+
+Verfijnt:
 
 - schermhiërarchie;
 - componenten;
-- formulieren;
-- tabellen/lijsten;
+- formulieren/lijsten/tabellen;
 - empty/loading/error/success states;
-- responsiviteit en toegankelijkheid.
+- responsive gedrag;
+- toegankelijkheid.
 
-**Gate:** de gebruiker moet de kerntaak kunnen doorlopen zonder technische architectuur te hoeven begrijpen.
+### Interaction gate
 
----
+De kerngebruiker moet de hoofdtaak begrijpelijk kunnen doorlopen zonder technische kennis of onnodige stappen.
 
-## Fase 5 — Architecture Gate
+Gebruik waar nuttig flowdiagrammen direct in de HackMD User Flows-note. Diagram en tekst moeten naar dezelfde requirements verwijzen.
 
-**Agent:** Solution Architect
+Wanneer de flow nieuwe functionele vragen blootlegt, ga terug naar de Functional Analyst. Dat is normale iteratie, geen fout.
 
-Output:
+## 3. Architecture / AI loop
+
+### Solution Architect
+
+Ontwerpt de minimale betrouwbare systeemstructuur:
 
 - system context;
 - frontend/backend-grenzen;
-- datamodel op hoofdlijnen;
-- API/integratiegrenzen;
+- datastromen;
+- data-eigenaarschap;
+- API's/integraties;
 - auth/rechten;
-- security/privacy-impact;
-- deploymentkeuzes;
-- technische onzekerheden.
+- security/privacy;
+- deployment/operations.
 
-De architect kiest de eenvoudigste architectuur die het geval betrouwbaar ondersteunt.
+### AI & Automation Architect
 
----
+Beoordeelt per kandidaatonderdeel:
 
-## Fase 6 — AI/Automation Gate
+1. kan dit eenvoudiger deterministisch;
+2. waarom zou AI/automation beter zijn;
+3. wat kost een fout;
+4. hoe meten we kwaliteit;
+5. welke context/tools zijn nodig;
+6. waar is menselijke approval nodig;
+7. wat is de fallback.
 
-**Agent:** AI & Automation Architect
+### Architecture gate
 
-Voor elk kandidaatonderdeel:
+Ga pas naar build planning wanneer:
 
-1. Kan dit deterministisch eenvoudiger?
-2. Wat voegt AI/automation concreet toe?
-3. Wat is de foutkost?
-4. Hoe meten we kwaliteit?
-5. Welke menselijke controle is nodig?
-6. Wat is de fallback?
+- de architectuur de afgesproken scope ondersteunt;
+- belangrijke datastromen en integraties bekend zijn;
+- security/privacy niet als latere toevoeging worden behandeld;
+- AI/no-AI keuzes expliciet zijn;
+- kritieke technische onzekerheden als concrete spikes zijn gemarkeerd.
 
-Output:
+Bij overengineering: Product Critic inschakelen.
 
-- AI/automation feature map;
-- model/context/tool-behoefte;
-- evaluatiecriteria;
-- guardrails;
-- human-in-the-loop momenten;
-- onderdelen waar expliciet géén AI gebruikt moet worden.
+## 4. Risk / Build loop
 
----
+### QA & Risk Analyst
 
-## Fase 7 — Risk Gate
-
-**Agent:** QA & Risk Analyst
-
-Output:
+Probeert het ontwerp te breken via:
 
 - acceptance criteria;
 - edge cases;
 - misuse cases;
-- privacy/security-risico's;
 - failure modes;
-- testmatrix;
+- privacy/security-risico's;
+- AI-specifieke failure modes;
 - release blockers.
 
----
+### Tech Lead
 
-## Fase 8 — Build Gate
+Maakt daarna:
 
-**Agent:** Tech Lead
-
-Output:
-
-- verticale slices;
-- eerste end-to-end slice;
+- kleinste verticale end-to-end slice;
 - epics/stories;
-- dependencyvolgorde;
-- definition of done;
-- technische spikes alleen voor echte onzekerheden;
-- expliciete zaken die nog niet gebouwd worden.
+- dependencies;
+- Definition of Done;
+- noodzakelijke spikes;
+- expliciete non-scope.
 
-De eerste slice moet zo klein mogelijk zijn maar daadwerkelijk end-to-end werken.
+### Build gate
 
----
+Code mag starten wanneer:
 
-## Fase 9 — Challenge Gate
+- de eerste verticale slice een echte gebruikersuitkomst bewijst;
+- kritieke requirements niet meer conflicteren;
+- relevante risico's een control/fallback hebben;
+- open technische onzekerheden bewust geaccepteerd of getest zijn;
+- de eigenaar de scope heeft goedgekeurd.
 
-**Agent:** Product Critic
+## 5. Product Critic als challenge-lane
 
-De criticus krijgt de volledige huidige blauwdruk en zoekt actief naar:
+De Product Critic is geen verplichte laatste fase. Zet hem in wanneer:
 
-- overbouw;
-- onbewijsbare aannames;
-- feature creep;
-- zwakke betaalreden;
-- UX-complexiteit;
-- technische overengineering;
-- AI waar eenvoudiger regels volstaan;
-- risico's die de andere rollen onderschatten.
+- productwaarde onzeker blijft;
+- scope groeit;
+- een flow complex wordt;
+- architectuur zwaarder wordt;
+- AI wordt toegevoegd;
+- de buildscope te groot aanvoelt;
+- een belangrijke investering of beslissing nadert.
 
-Output:
+De Critic geeft `GO`, `REVISE` of `STOP`, maar beslist niet zelfstandig.
 
-- top 5 bezwaren;
-- wat geschrapt kan worden;
-- wat eerst bewezen moet worden;
-- go / revise / stop advies.
+## 6. Product Design Lead als orchestrator
 
----
+De Product Design Lead:
 
-## Fase 10 — Synthese
+- leest de Project Hub;
+- bepaalt welke onzekerheid nu het belangrijkst is;
+- kiest de juiste specialist;
+- formuleert een afgebakende opdracht;
+- bewaakt gates en conflicten;
+- voorkomt dubbel werk;
+- laat de Hubstatus actualiseren;
+- vraagt een menselijke beslissing wanneer nodig.
 
-**Eigenaar:** Product Strategist + gebruiker/eigenaar
+De Lead doet niet zelf het specialistische werk van alle rollen.
 
-Werk bij:
+## 7. HackMD handoff-regel
 
-- `project-brief.md`;
-- `decisions.md`;
-- MVP-scope;
-- succescriteria;
-- eerstvolgende validatie- of bouwactie.
+Na elke relevante agentrun wordt alleen de juiste HackMD-note bijgewerkt.
 
-Geen stille wijzigingen: belangrijke scope-, architectuur- en risicobeslissingen worden gelogd.
+Elke handoff bevat:
 
-## Iteraties
+- gewijzigde inzichten;
+- geraakte requirements/beslissingen;
+- open vragen/conflicten;
+- voorgestelde volgende rol;
+- links naar relevante notes/secties.
 
-Na gebruikersfeedback, testresultaten of nieuwe feiten wordt niet automatisch het hele proces herhaald. Start opnieuw bij de vroegste fase waarvan de aannames veranderd zijn.
+Geen kopieën van live appdocumentatie in deze GitHub-map.
+
+## 8. Itereren op verandering
+
+Bij nieuwe gebruikersfeedback, validatiedata of technische feiten herhaal je niet automatisch het hele proces.
+
+Ga terug naar de vroegste loop waarvan een aanname daadwerkelijk veranderd is. Laat afhankelijke notes daarna gericht hercontroleren.
+
+## 9. Eindresultaat vóór code
+
+Een voldoende volwassen HackMD-blauwdruk bevat minimaal:
+
+- producthypothese + bewijsstatus;
+- kernrequirements en business rules;
+- primary user flow + relevante errors;
+- schermblauwdruk voor de kernflow;
+- minimale solution architecture;
+- expliciete AI/no-AI keuzes;
+- belangrijkste risico's + acceptance criteria;
+- eerste verticale buildslice;
+- decision log voor keuzes die latere bouw beïnvloeden.
