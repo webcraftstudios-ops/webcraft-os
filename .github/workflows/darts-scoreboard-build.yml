@@ -1,0 +1,42 @@
+name: Darts Scoreboard Build
+
+on:
+  push:
+    branches:
+      - project/darts-live-camera-support
+    paths:
+      - 'projects/darts-live-camera-support/app/**'
+      - '.github/workflows/darts-scoreboard-build.yml'
+  pull_request:
+    paths:
+      - 'projects/darts-live-camera-support/app/**'
+      - '.github/workflows/darts-scoreboard-build.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: projects/darts-live-camera-support/app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: projects/darts-live-camera-support/app/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Test with Coverage
+        run: npm run test:coverage
+
+      - name: Build
+        run: npm run build

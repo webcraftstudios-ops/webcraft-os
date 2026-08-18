@@ -1,0 +1,11 @@
+{
+  "name": "rtsp-snapshot-bridge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local RTSP-to-JPEG bridge for the Darts Live Camera Support IP camera integration (Sprint 2.7).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  }
+}
